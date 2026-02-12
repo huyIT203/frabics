@@ -38,12 +38,52 @@ const CATEGORIES = [
     { label: 'Khác', key: 'other' },
 ];
 
+const getMenuItems = (isProductOpen: boolean): MenuProps['items'] => [
+    {
+        key: '1',
+        label: <Link href="/" style={styles.menuLink}>Trang chủ</Link>
+    },
+    {
+        key: '2',
+        label: (
+            <span style={styles.menuLabelWithIcon}>
+                SẢN PHẨM
+                <DownOutlined
+                    style={{
+                        fontSize: '10px',
+                        marginLeft: '4px',
+                        transition: 'transform 0.3s ease',
+                        transform: isProductOpen ? 'rotate(-180deg)' : 'rotate(0deg)'
+                    }}
+                />
+            </span>
+        ),
+        children: CATEGORIES.map(cat => ({
+            key: cat.key,
+            label: <Link href={`/products?category=${cat.key}`}>{cat.label}</Link>,
+            style: styles.subMenuItem
+        }))
+    },
+    {
+        key: '3',
+        label: <Link href="/blog" style={styles.menuLink}>BLOG</Link>
+    },
+    {
+        key: '4',
+        label: <Link href="/about" style={styles.menuLink}>GIỚI THIỆU</Link>
+    },
+    {
+        key: '5',
+        label: <Link href="/contact" style={styles.menuLink}>LIÊN HỆ</Link>
+    },
+];
+
 export const Header = () => {
-    const cartItems = useCartStore((state) => state.items);
+    const { items: cartItems, isOpen: cartOpen, setOpen: setCartOpen } = useCartStore();
     const screens = useBreakpoint();
     const [openKeys, setOpenKeys] = useState<string[]>([]);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [cartOpen, setCartOpen] = useState(false);
+    // const [cartOpen, setCartOpen] = useState(false); // Đã chuyển sang store
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const mounted = useSyncExternalStore(
         () => () => { },
@@ -51,8 +91,8 @@ export const Header = () => {
         () => false
     );
 
-    // Mặc định là desktop để tránh flash hoặc mất element khi SSR
     const isDesktop = mounted ? (screens.md ?? true) : true;
+    const isProductOpen = openKeys.includes('2');
 
     const onOpenChange: MenuProps['onOpenChange'] = (keys) => {
         const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1);
@@ -63,47 +103,7 @@ export const Header = () => {
         }
     };
 
-    const isProductOpen = openKeys.includes('2');
-
-    const menuItems: MenuProps['items'] = [
-        {
-            key: '1',
-            label: <Link href="/" style={styles.menuLink}>Trang chủ</Link>
-        },
-        {
-            key: '2',
-            label: (
-                <span style={styles.menuLabelWithIcon}>
-                    SẢN PHẨM
-                    <DownOutlined
-                        style={{
-                            fontSize: '10px',
-                            marginLeft: '4px',
-                            transition: 'transform 0.3s ease',
-                            transform: isProductOpen ? 'rotate(-180deg)' : 'rotate(0deg)'
-                        }}
-                    />
-                </span>
-            ),
-            children: CATEGORIES.map(cat => ({
-                key: cat.key,
-                label: <Link href={`/products?category=${cat.key}`}>{cat.label}</Link>,
-                style: styles.subMenuItem
-            }))
-        },
-        {
-            key: '3',
-            label: <Link href="/blog" style={styles.menuLink}>BLOG</Link>
-        },
-        {
-            key: '4',
-            label: <Link href="/about" style={styles.menuLink}>GIỚI THIỆU</Link>
-        },
-        {
-            key: '5',
-            label: <Link href="/contact" style={styles.menuLink}>LIÊN HỆ</Link>
-        },
-    ];
+    const menuItems = getMenuItems(isProductOpen);
 
     return (
         <AntHeader style={{
@@ -202,6 +202,7 @@ export const Header = () => {
                 open={mobileMenuOpen}
                 width={280}
                 styles={{ body: { padding: 0 } }}
+                destroyOnClose
             >
                 <Menu
                     mode="inline"

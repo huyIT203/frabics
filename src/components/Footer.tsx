@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { Row, Col, Typography, Space } from 'antd';
 import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
-import { Logo } from '@/shared/components/brand/logo';
 import { StyleSheet } from '@/shared/utils/styles';
 
 const { Text, Title } = Typography;
@@ -16,7 +15,7 @@ export const Footer = () => {
                     {/* Brand & Description */}
                     <Col xs={24} md={12} lg={6}>
                         <div style={{ marginBottom: 16 }}>
-                            <Logo />
+
                         </div>
                         <Text type="secondary" style={styles.textBlock}>
                             Thiện Oanh - Chuyên cung cấp các loại vải cao cấp, ren và phụ liệu may mặc chất lượng. Mang đến sự tinh tế cho từng sản phẩm.
