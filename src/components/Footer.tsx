@@ -19,7 +19,7 @@ export const Footer = () => {
                             <Logo />
                         </div>
                         <Text type="secondary" style={styles.textBlock}>
-                            Creating premium digital experiences with modern web technologies. Quality code, beautiful design.
+                            Thiện Oanh - Chuyên cung cấp các loại vải cao cấp, ren và phụ liệu may mặc chất lượng. Mang đến sự tinh tế cho từng sản phẩm.
                         </Text>
                         <Space size="large" style={{ marginTop: 16 }}>
                             <Facebook size={20} style={styles.icon} />
@@ -30,41 +30,41 @@ export const Footer = () => {
 
                     {/* Quick Links */}
                     <Col xs={24} md={12} lg={6}>
-                        <Title level={5} style={styles.heading}>Quick Links</Title>
+                        <Title level={5} style={styles.heading}>Liên kết nhanh</Title>
                         <Space orientation="vertical">
-                            <Link href="/">Home</Link>
-                            <Link href="/products">Products</Link>
-                            <Link href="/about">About Us</Link>
+                            <Link href="/">Trang chủ</Link>
+                            <Link href="/products">Sản phẩm</Link>
+                            <Link href="/about">Về chúng tôi</Link>
                             <Link href="/blog">Blog</Link>
                         </Space>
                     </Col>
 
                     {/* Support */}
                     <Col xs={24} md={12} lg={6}>
-                        <Title level={5} style={styles.heading}>Support</Title>
+                        <Title level={5} style={styles.heading}>Hỗ trợ</Title>
                         <Space orientation="vertical">
-                            <Link href="/faq">FAQ</Link>
-                            <Link href="/shipping">Shipping & Returns</Link>
-                            <Link href="/privacy">Privacy Policy</Link>
-                            <Link href="/terms">Terms of Service</Link>
+                            <Link href="/faq">Câu hỏi thường gặp</Link>
+                            <Link href="/shipping">Chính sách vận chuyển</Link>
+                            <Link href="/privacy">Chính sách bảo mật</Link>
+                            <Link href="/terms">Điều khoản dịch vụ</Link>
                         </Space>
                     </Col>
 
                     {/* Contact Info */}
                     <Col xs={24} md={12} lg={6}>
-                        <Title level={5} style={styles.heading}>Contact</Title>
+                        <Title level={5} style={styles.heading}>Liên hệ</Title>
                         <Space orientation="vertical" size="middle">
                             <div style={styles.contactItem}>
                                 <MapPin size={18} color="#0F172A" />
-                                <Text>123 Innovation St, Tech City</Text>
+                                <Text>Số 123 Đường Vải, Quận Tân Bình, TP. HCM</Text>
                             </div>
                             <div style={styles.contactItem}>
                                 <Phone size={18} color="#0F172A" />
-                                <Text>+1 (555) 123-4567</Text>
+                                <Text>+84 123 456 789</Text>
                             </div>
                             <div style={styles.contactItem}>
                                 <Mail size={18} color="#0F172A" />
-                                <Text>hello@example.com</Text>
+                                <Text>contact@thienoanh.com</Text>
                             </div>
                         </Space>
                     </Col>
@@ -72,7 +72,7 @@ export const Footer = () => {
 
                 <div style={styles.copyright}>
                     <Text type="secondary" suppressHydrationWarning>
-                        &copy; {new Date().getFullYear()} BrandName. All rights reserved.
+                        &copy; {new Date().getFullYear()} Thiện Oanh. Bảo lưu mọi quyền.
                     </Text>
                 </div>
             </div>

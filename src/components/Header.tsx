@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { Layout, Menu, Button, Badge, Drawer, Grid } from 'antd'; // 1. Import Drawer, Grid
+import { useState, useSyncExternalStore } from 'react';
+import { Layout, Menu, Button, Badge, Drawer, Grid, Input, Typography } from 'antd'; // Thêm Input, Typography
 import {
     ShoppingCartOutlined,
     UserOutlined,
     DownOutlined,
-    MenuOutlined // 2. Import icon Hamburger
+    MenuOutlined,
+    SearchOutlined
 } from '@ant-design/icons';
 import { StyleSheet } from '@/shared/utils/styles';
 import { useCartStore } from '@/store/useCartStore';
@@ -17,6 +18,7 @@ import { CartDrawer } from '@/components/CartDrawer';
 
 const { Header: AntHeader } = Layout;
 const { useBreakpoint } = Grid;
+const { Text } = Typography;
 
 const CATEGORIES = [
     { label: 'Tất cả', key: 'all' },
@@ -39,14 +41,20 @@ const CATEGORIES = [
 export const Header = () => {
     const cartItems = useCartStore((state) => state.items);
     const screens = useBreakpoint();
-
-
     const [openKeys, setOpenKeys] = useState<string[]>([]);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [cartOpen, setCartOpen] = useState(false);
-    // Xử lý logic mở menu con
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
+    const mounted = useSyncExternalStore(
+        () => () => { },
+        () => true,
+        () => false
+    );
+
+    // Mặc định là desktop để tránh flash hoặc mất element khi SSR
+    const isDesktop = mounted ? (screens.md ?? true) : true;
+
     const onOpenChange: MenuProps['onOpenChange'] = (keys) => {
-        // Giữ logic chỉ mở 1 menu tại 1 thời điểm (nếu muốn) hoặc mở nhiều
         const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1);
         if (latestOpenKey && latestOpenKey !== '2') {
             setOpenKeys(keys);
@@ -57,23 +65,21 @@ export const Header = () => {
 
     const isProductOpen = openKeys.includes('2');
 
-    // Cấu hình Items cho Menu (Dùng chung cho cả Desktop và Mobile)
     const menuItems: MenuProps['items'] = [
         {
             key: '1',
-            label: <Link href="/">Trang chủ</Link>
+            label: <Link href="/" style={styles.menuLink}>Trang chủ</Link>
         },
         {
             key: '2',
             label: (
-                <span className="flex items-center gap-1" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    Sản phẩm
+                <span style={styles.menuLabelWithIcon}>
+                    SẢN PHẨM
                     <DownOutlined
                         style={{
                             fontSize: '10px',
                             marginLeft: '4px',
                             transition: 'transform 0.3s ease',
-                            // Logic xoay mũi tên dùng chung cho cả 2 giao diện
                             transform: isProductOpen ? 'rotate(-180deg)' : 'rotate(0deg)'
                         }}
                     />
@@ -82,95 +88,120 @@ export const Header = () => {
             children: CATEGORIES.map(cat => ({
                 key: cat.key,
                 label: <Link href={`/products?category=${cat.key}`}>{cat.label}</Link>,
-                style: {
-                    height: '40px',
-                    lineHeight: '40px',
-                    margin: 0,
-                    fontSize: '14px',
-                    letterSpacing: '1px',
-                }
+                style: styles.subMenuItem
             }))
         },
         {
             key: '3',
-            label: <Link href="/blog">Blog</Link>
+            label: <Link href="/blog" style={styles.menuLink}>BLOG</Link>
         },
         {
             key: '4',
-            label: <Link href="/about">Giới thiệu</Link>
+            label: <Link href="/about" style={styles.menuLink}>GIỚI THIỆU</Link>
         },
         {
             key: '5',
-            label: <Link href="/contact">Liên hệ</Link>
+            label: <Link href="/contact" style={styles.menuLink}>LIÊN HỆ</Link>
         },
     ];
 
     return (
-        <AntHeader style={styles.headerContainer}>
-            {/* Logo */}
-            <Link href="/" style={styles.logoLink}>
-                <Logo />
-            </Link>
-
-            {/* Desktop Menu: Chỉ hiện khi màn hình >= md (768px) */}
-            {screens.md ? (
-                <Menu
-                    theme="light"
-                    mode="horizontal"
-                    defaultSelectedKeys={['1']}
-                    openKeys={openKeys}
-                    onOpenChange={onOpenChange}
-                    style={styles.desktopMenu}
-                    items={menuItems}
-                    expandIcon={null}
-                    triggerSubMenuAction="hover"
-                />
-            ) : null}
-
-            {/* Actions (Giỏ hàng & User) */}
-            <div style={styles.actions}>
-                <Badge count={cartItems.length} showZero>
-                    <Button
-                        type="primary"
-                        shape="circle"
-                        icon={<ShoppingCartOutlined />}
-                        size="large"
-                        onClick={() => setCartOpen(true)}
-                    />
-                </Badge>
-
-                {/* Ẩn nút Login chữ trên mobile cho gọn */}
-                {screens.md && (
-                    <Button
-                        type="text"
-                        style={{ color: 'black', marginLeft: 10 }}
-                        icon={<UserOutlined />}
-                    >
-                        Đăng nhập
-                    </Button>
-                )}
-
-                {/* Nút Hamburger: Chỉ hiện khi màn hình nhỏ (< md) */}
-                {!screens.md && (
-                    <Button
-                        type="text"
-                        icon={<MenuOutlined style={{ fontSize: '20px' }} />}
-                        onClick={() => setMobileMenuOpen(true)}
-                        style={{ marginLeft: 10 }}
-                    />
-                )}
+        <AntHeader style={{
+            ...styles.headerContainer,
+            padding: isDesktop ? '0 40px' : '0 16px',
+        }}>
+            {/* KHỐI TRÁI: Logo cố định */}
+            <div style={{
+                ...styles.leftSection,
+                width: isDesktop ? '280px' : 'auto',
+                flex: isDesktop ? '0 0 280px' : '1 1 auto',
+            }}>
+                <Link href="/" style={styles.logoLink}>
+                    <Logo style={{ height: isDesktop ? '60px' : '60px', width: 'auto' }} />
+                </Link>
             </div>
 
-            {/* DRAWER MOBILE: Sidebar trượt từ phải qua */}
+            {/* KHỐI GIỮA: Chứa Menu và Search tương tác với nhau */}
+            {isDesktop && (
+                <div style={styles.centerSection}>
+                    {/* Menu Điều hướng: Co lại khi search được focus */}
+                    <div style={{
+                        ...styles.menuWrapper,
+                        flex: isSearchFocused ? 0 : 1,
+                        opacity: isSearchFocused ? 0 : 1,
+                        visibility: isSearchFocused ? 'hidden' : 'visible',
+                        transform: isSearchFocused ? 'translateX(-20px)' : 'translateX(0)',
+                        overflow: 'hidden',
+                    }}>
+                        <Menu
+                            theme="light"
+                            mode="horizontal"
+                            defaultSelectedKeys={['1']}
+                            openKeys={openKeys}
+                            onOpenChange={onOpenChange}
+                            style={styles.desktopMenu}
+                            items={menuItems}
+                            expandIcon={null}
+                            triggerSubMenuAction="hover"
+                        />
+                    </div>
+
+                    {/* Thanh tìm kiếm: Tự động dài ra */}
+                    <div style={{
+                        ...styles.searchWrapper,
+                        flex: isSearchFocused ? 1 : '0 0 340px',
+                        maxWidth: isSearchFocused ? '100%' : '340px',
+                    }}>
+                        <Input
+                            placeholder="Tìm kiếm sản phẩm..."
+                            prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
+                            style={styles.searchInput}
+                            onFocus={() => setIsSearchFocused(true)}
+                            onBlur={() => setIsSearchFocused(false)}
+                            allowClear
+                        />
+                    </div>
+                </div>
+            )}
+
+            {/* KHỐI PHẢI: Các button Actions cố định */}
+            <div style={{
+                ...styles.rightSection,
+                width: isDesktop ? '280px' : 'auto',
+                flex: isDesktop ? '0 0 280px' : '1 1 auto',
+            }}>
+                <div style={styles.actions}>
+                    <div style={styles.actionItem} onClick={() => setCartOpen(true)}>
+                        <Badge count={cartItems.length} showZero size="small" offset={[2, 0]}>
+                            <ShoppingCartOutlined style={styles.actionIcon} />
+                        </Badge>
+                        {isDesktop && <Text style={styles.actionText}>GIỎ HÀNG</Text>}
+                    </div>
+
+                    <div style={styles.actionItem}>
+                        <UserOutlined style={styles.actionIcon} />
+                        {isDesktop && <Text style={styles.actionText}>ĐĂNG NHẬP</Text>}
+                    </div>
+
+                    {!isDesktop && (
+                        <Button
+                            type="text"
+                            icon={<MenuOutlined style={{ fontSize: '20px' }} />}
+                            onClick={() => setMobileMenuOpen(true)}
+                            style={{ marginLeft: 5 }}
+                        />
+                    )}
+                </div>
+            </div>
+
+            {/* Sidebar Mobile */}
             <Drawer
-                title="Menu"
+                title="MENU"
                 placement="right"
                 onClose={() => setMobileMenuOpen(false)}
                 open={mobileMenuOpen}
-                width={250}
-                styles={{
-                    body: { padding: 0 }
-                }}
+                width={280}
+                styles={{ body: { padding: 0 } }}
             >
                 <Menu
                     mode="inline"
@@ -179,26 +210,14 @@ export const Header = () => {
                     onOpenChange={onOpenChange}
                     items={menuItems}
                     expandIcon={null}
-                    style={{ border: 'none', letterSpacing: '1px' }}
-                    onClick={() => {
-
-                        setMobileMenuOpen(false);
+                    style={{ border: 'none' }}
+                    onClick={(e) => {
+                        if (e.key !== '2') setMobileMenuOpen(false);
                     }}
                 />
-
-                {/* Nút đăng nhập cho Mobile nằm dưới cùng Drawer */}
-                <div style={{ padding: '20px', borderTop: '1px solid #f0f0f0' }}>
-                    <Button block icon={<UserOutlined />}>
-                        Đăng nhập
-                    </Button>
-                </div>
             </Drawer>
 
-            {/* 4. CartDrawer*/}
-            <CartDrawer
-                open={cartOpen}
-                onClose={() => setCartOpen(false)}
-            />
+            <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
         </AntHeader>
     );
 };
@@ -209,7 +228,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         backgroundColor: '#FFFFFF',
-        padding: '0 20px',
+        padding: '0 40px',
         height: '84px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
         position: 'sticky',
@@ -217,24 +236,99 @@ const styles = StyleSheet.create({
         zIndex: 1000,
         width: '100%',
     },
-    logoLink: {
-        marginRight: '20px',
+    leftSection: {
         display: 'flex',
         alignItems: 'center',
+        flexShrink: 0,
+    },
+    centerSection: {
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '0 20px',
+        overflow: 'hidden',
+    },
+    rightSection: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        flexShrink: 0,
+    },
+    logoLink: {
+        display: 'flex',
+        alignItems: 'center',
+        width: 'auto',
+    },
+    searchWrapper: {
+        flexShrink: 0,
+        marginLeft: '20px',
+        marginRight: '20px',
+        transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+        display: 'flex',
+        justifyContent: 'flex-end',
+    },
+    searchInput: {
+        borderRadius: '20px',
+        backgroundColor: '#f5f5f5',
+        border: 'none',
+        height: '36px',
+        width: '100%',
     },
     desktopMenu: {
-        marginLeft: '40px',
-        flex: 1,
+        display: 'flex',
+        justifyContent: 'center',
         minWidth: 0,
         backgroundColor: 'transparent',
         borderBottom: 'none',
-        fontSize: '16px',
+        lineHeight: '84px',
+        border: 'none',
+    },
+
+    menuLink: {
+        letterSpacing: '2px',
         fontWeight: 300,
-        letterSpacing: '2px', // Letter spacing cho Desktop
+        textTransform: 'uppercase',
+        fontSize: '13px',
+    },
+    menuLabelWithIcon: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4px',
+        letterSpacing: '2px',
+        fontWeight: 300,
+        fontSize: '13px',
+    },
+    menuWrapper: {
+        flex: 1,
+        transition: 'all 0.3s ease',
+    },
+    subMenuItem: {
+        height: '40px',
+        lineHeight: '40px',
+        margin: 0,
+        fontSize: '14px',
+        letterSpacing: '1px',
     },
     actions: {
         display: 'flex',
         alignItems: 'center',
-        gap: '10px',
+        gap: '24px',
+    },
+    actionItem: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        cursor: 'pointer',
+    },
+    actionIcon: {
+        fontSize: '20px',
+        color: '#000',
+    },
+    actionText: {
+        fontSize: '12px',
+        fontWeight: 600,
+        letterSpacing: '1px',
+        whiteSpace: 'nowrap',
     },
 });

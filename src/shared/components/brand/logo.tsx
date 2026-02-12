@@ -24,7 +24,5 @@ export const Logo = ({ style }: LogoProps) => {
 const styles = StyleSheet.create({
     image: {
         objectFit: 'contain',
-        width: `${LOGO_WIDTH}px`,
-        height: `${LOGO_HEIGHT}px`,
     }
 });

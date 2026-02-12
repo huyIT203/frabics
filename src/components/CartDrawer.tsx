@@ -1,10 +1,11 @@
 'use client';
-import { Drawer, Button, Typography } from 'antd';
+import { Drawer, Button, Typography, Grid } from 'antd'; // 1. Import Grid
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { StyleSheet } from '@/shared/utils/styles';
 import { useCartStore } from '@/store/useCartStore';
 
 const { Text } = Typography;
+const { useBreakpoint } = Grid; // 2. Khai báo hook sử dụng Breakpoint
 
 interface CartDrawerProps {
     open: boolean;
@@ -13,11 +14,14 @@ interface CartDrawerProps {
 
 export const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
     const { items } = useCartStore();
+    const screens = useBreakpoint(); // 3. Lấy thông tin kích thước màn hình
 
-    // Tính tổng tiền
+    // 4. Logic xác định chiều rộng: 
+    // Nếu màn hình nhỏ hơn 'md' (768px) thì dùng 300, ngược lại dùng 400
+    const drawerWidth = screens.md ? 400 : 300;
+
     const totalPrice = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
-    // Format tiền tệ (VND)
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
     };
@@ -28,13 +32,12 @@ export const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
             placement="right"
             onClose={onClose}
             open={open}
-            width={'300px'}
+            width={drawerWidth} // 5. Truyền biến chiều rộng đã tính toán vào đây
             styles={{
                 header: { borderBottom: '1px solid #f0f0f0' },
                 body: { padding: 0, display: 'flex', flexDirection: 'column' },
                 footer: { padding: '20px', borderTop: '1px solid #f0f0f0' }
             }}
-            // Phần Footer cố định ở dưới
             footer={
                 <div style={styles.footerContainer}>
                     <div style={styles.totalRow}>
@@ -48,10 +51,7 @@ export const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                             block
                             size="large"
                             style={styles.blackButton}
-                            onClick={() => {
-                                onClose();
-                                // router.push('/cart'); // Thêm điều hướng sau này
-                            }}
+                            onClick={() => onClose()}
                         >
                             XEM GIỎ HÀNG
                         </Button>
@@ -73,7 +73,6 @@ export const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                     <Text style={{ color: '#595959' }}>Hiện chưa có sản phẩm</Text>
                 </div>
             ) : (
-                // Giao diện khi có sản phẩm (Sẽ làm sau)
                 <div style={{ padding: '20px' }}>
                     {items.map(item => (
                         <div key={item.id} style={{ marginBottom: 10 }}>{item.name} - x{item.quantity}</div>
@@ -83,7 +82,6 @@ export const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
         </Drawer>
     );
 };
-
 const styles = StyleSheet.create({
     emptyContainer: {
         display: 'flex',
