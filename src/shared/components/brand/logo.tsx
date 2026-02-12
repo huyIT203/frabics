@@ -1,21 +1,30 @@
 import Image from 'next/image';
-import { cn } from '@/shared/utils/cn';
+import { StyleSheet } from '@/shared/utils/styles';
+
+const LOGO_WIDTH = 200;
+const LOGO_HEIGHT = 180;
 
 interface LogoProps {
-    className?: string; // Additional classes for styling (e.g., width, height, margins)
-    width?: number;     // Optional override for width
-    height?: number;    // Optional override for height
+    style?: React.CSSProperties;
 }
 
-export const Logo = ({ className, width = 200, height = 47 }: LogoProps) => {
+export const Logo = ({ style }: LogoProps) => {
     return (
         <Image
             src="/logo.svg"
             alt="Brand Logo"
-            width={width}
-            height={height}
-            className={cn("w-auto", className)}
-            priority // Ensure logo loads quickly as it's typically above the fold
+            width={LOGO_WIDTH}
+            height={LOGO_HEIGHT}
+            style={{ ...styles.image, ...style }}
+            priority
         />
     );
 };
+
+const styles = StyleSheet.create({
+    image: {
+        objectFit: 'contain',
+        width: `${LOGO_WIDTH}px`,
+        height: `${LOGO_HEIGHT}px`,
+    }
+});
