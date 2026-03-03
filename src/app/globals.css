@@ -1,6 +1,6 @@
 /* src/app/globals.css */
 :root {
-    --font-sans: "Gotham Book", "Inter", sans-serif;
+    --font-sans: "Playfair Display";
 }
 
 * {
@@ -10,9 +10,10 @@
 }
 
 body {
-    font-family: var(--font-sans);
     background-color: #ffffff;
-    /* Ant Design sẽ tự lo phần màu sắc còn lại */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 a {
