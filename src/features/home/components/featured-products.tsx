@@ -2,12 +2,14 @@
 import { useState } from 'react';
 
 
-import { Typography, Row, Col, Grid, Button, Tooltip } from 'antd';
+import { Typography, Grid, Button, Tooltip, Carousel } from 'antd';
 import { StyleSheet } from '@/shared/utils/styles';
 import Image from 'next/image';
-import { EyeOutlined, ShoppingCartOutlined } from '@ant-design/icons';
+import { EyeOutlined, ShoppingCartOutlined, ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { MOCK_PRODUCTS, Product } from '../data/products';
 import { useCartStore } from '@/store/useCartStore';
+import { CarouselRef } from 'antd/es/carousel';
+import { useRef } from 'react';
 
 const { useBreakpoint } = Grid;
 
@@ -120,34 +122,55 @@ const ProductCard = ({ product }: { product: Product }) => {
 };
 
 export const FeaturedProducts = () => {
+    const carouselRef = useRef<CarouselRef>(null);
+
     return (
         <section style={styles.container}>
             {/* Tiêu đề phần Sản phẩm nổi bật */}
             <div style={styles.header}>
-                <Typography.Title level={2} style={styles.mainTitle}>SẢN PHẨM NỔI BẬT</Typography.Title>
+                <Typography.Title level={2} style={styles.mainTitle}>Sản Phẩm Nổi Bật</Typography.Title>
                 <Typography.Text type="secondary" style={styles.subTitle}>
                     Khám phá những mẫu vải được yêu thích nhất
                 </Typography.Text>
             </div>
 
-            {/* Danh sách sản phẩm với đường kẻ lưới */}
-            <div style={styles.gridWrapper}>
-                <Row gutter={0}>
+            {/* Danh sách sản phẩm với Carousel và nút điều hướng */}
+            <div style={styles.carouselWrapper}>
+                <Button
+                    icon={<ArrowLeftOutlined />}
+                    style={styles.arrowLeft}
+                    shape="circle"
+                    onClick={() => carouselRef.current?.prev()}
+                />
+
+                <Carousel
+                    ref={carouselRef}
+                    slidesToShow={5}
+                    slidesToScroll={1}
+                    dots={false}
+                    infinite={true}
+                    responsive={[
+                        { breakpoint: 1200, settings: { slidesToShow: 4 } },
+                        { breakpoint: 992, settings: { slidesToShow: 3 } },
+                        { breakpoint: 768, settings: { slidesToShow: 2 } },
+                        { breakpoint: 480, settings: { slidesToShow: 1 } },
+                    ]}
+                >
                     {MOCK_PRODUCTS.map((product) => (
-                        <Col
-                            key={product.id}
-                            xs={{ flex: '50%' }}
-                            sm={{ flex: '33.33%' }}
-                            md={{ flex: '25%' }}
-                            lg={{ flex: '20%' }}
-                            style={{
-                                ...styles.productCol,
-                            }}
-                        >
-                            <ProductCard product={product} />
-                        </Col>
+                        <div key={product.id}>
+                            <div style={styles.productCol}>
+                                <ProductCard product={product} />
+                            </div>
+                        </div>
                     ))}
-                </Row>
+                </Carousel>
+
+                <Button
+                    icon={<ArrowRightOutlined />}
+                    style={styles.arrowRight}
+                    shape="circle"
+                    onClick={() => carouselRef.current?.next()}
+                />
             </div>
         </section>
     );
@@ -156,38 +179,35 @@ export const FeaturedProducts = () => {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        padding: '60px 0',
         backgroundColor: '#ffffff',
+        marginBottom: '60px',
     },
     header: {
         textAlign: 'center',
-        marginBottom: '60px',
+        marginBottom: '20px',
     },
     mainTitle: {
-        fontSize: '24px',
-        fontWeight: 600,
+        fontSize: '42px',
+        fontWeight: 100,
         letterSpacing: '1px',
-        marginBottom: '8px ',
-        textTransform: 'uppercase',
+        marginBottom: '15px ',
         lineHeight: '40px',
-        fontFamily: 'Gotham Book, sans-serif',
+        fontFamily: 'Playfair Display',
         fontStyle: 'Bold',
     },
     subTitle: {
-        fontSize: '17px',
-        fontFamily: 'Gotham Book, sans-serif',
+        fontSize: '15px',
+        fontFamily: 'Lato, sans-serif',
         color: '#231F20',
         lineHeight: '20px',
         display: 'block',
     },
-    gridWrapper: {
-        borderTop: '1px solid #e8e8e8',
-        borderLeft: '1px solid #e8e8e8',
-        width: '100%',
+    carouselWrapper: {
+        position: 'relative',
+        padding: '0 50px',
     },
     productCol: {
         borderRight: '1px solid #e8e8e8',
-        borderBottom: '1px solid #e8e8e8',
         padding: '30px 20px',
         transition: 'all 0.3s ease',
     },
@@ -263,5 +283,38 @@ const styles = StyleSheet.create({
         color: '#000',
         marginTop: '4px',
         display: 'block',
+        fontStyle: 'italic',
+    },
+    arrowLeft: {
+        position: 'absolute',
+        left: '0px',
+        top: '40%',
+        zIndex: 10,
+        width: '44px',
+        height: '44px',
+        backgroundColor: '#F4EFE7',
+        border: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#1a1a1a',
+        fontSize: '18px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+    },
+    arrowRight: {
+        position: 'absolute',
+        right: '0px',
+        top: '40%',
+        zIndex: 10,
+        width: '44px',
+        height: '44px',
+        backgroundColor: '#F4EFE7',
+        border: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#1a1a1a',
+        fontSize: '18px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
     }
 });

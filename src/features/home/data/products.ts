@@ -28,7 +28,7 @@ export const FEATURED_PRODUCTS_DATA: Product[] = [
     },
     {
         id: 2,
-        name: 'LINEN GÂN',
+        name: 'Linen Gân',
         slug: 'linen-gan',
         description: 'Vải linen gân thoáng mát',
         variants: [
@@ -39,7 +39,7 @@ export const FEATURED_PRODUCTS_DATA: Product[] = [
     },
     {
         id: 3,
-        name: 'LỤA IN BI ĐẠI',
+        name: 'Lụa In Bi Đại',
         slug: 'lua-in-bi-dai',
         description: 'Lụa in họa tiết bi đại',
         variants: [
@@ -74,4 +74,4 @@ export const MOCK_PRODUCTS: Product[] = [
     ...FEATURED_PRODUCTS_DATA.map(p => ({ ...p, id: p.id + 5, slug: `${p.slug}-2` })),
     ...FEATURED_PRODUCTS_DATA.map(p => ({ ...p, id: p.id + 10, slug: `${p.slug}-3` })),
     ...FEATURED_PRODUCTS_DATA.map(p => ({ ...p, id: p.id + 15, slug: `${p.slug}-4` })),
-].slice(0, 20);
+].slice(0, 5);

@@ -10,7 +10,7 @@ import { Footer } from '@/components/Footer';
 
 import { typography } from '@/styles/typography';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin', 'vietnamese'] });
 
 export const metadata = {
     title: 'Cửa hàng vải cao cấp',

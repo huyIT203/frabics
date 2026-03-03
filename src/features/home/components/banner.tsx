@@ -1,207 +1,162 @@
 'use client';
 
-import React from 'react';
-import { Row, Col, Typography, Carousel, Grid } from 'antd';
-import { useSyncExternalStore } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet } from '@/shared/utils/styles';
-import Image from 'next/image';
-import Link from 'next/link';
-import { RightOutlined } from '@ant-design/icons';
-
-const { Title, Text } = Typography;
-
-const BANNER_ITEMS = {
-    gam: {
-        title: 'Vải gấm hoa mai',
-        subTitle: 'Xem thêm BST Vải gấm',
-        image: '/banner/vai1.png',
-        link: '/products?category=gam',
-    },
-    voan: {
-        title: 'Voan lá hồ điệp',
-        subTitle: 'Xem thêm BST Vải tơ/voan',
-        image: '/banner/vai2.jpg',
-        link: '/products?category=to-voan',
-    },
-    linen: {
-        title: 'Vải linen gân',
-        subTitle: 'Xem thêm BST Vải linen',
-        image: '/banner/vai3.jpg',
-        link: '/products?category=linen',
-    },
-    lua: {
-        title: 'Vải lụa Quảng Châu',
-        subTitle: 'Xem thêm BST Vải lụa',
-        image: '/banner/vai4.jpg',
-        link: '/products?category=lua',
-    },
-    thun: {
-        title: 'Vải thun len ấm áp',
-        subTitle: 'Xem thêm BST Vải thun',
-        image: '/banner/vai5.jpg',
-        link: '/products?category=thun',
-    }
-};
-
-interface BannerItem {
-    title: string;
-    subTitle: string;
-    image: string;
-    link: string;
-}
-
-const BannerCard = ({ item, height, priority = false }: { item: BannerItem, height: number | string, priority?: boolean }) => {
-    const [isHovered, setIsHovered] = React.useState(false);
-
-    return (
-        <Link
-            href={item.link}
-            style={{ ...styles.bannerCard, height }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                style={{
-                    objectFit: 'cover',
-                    transition: 'transform 0.8s cubic-bezier(0.2, 0, 0.2, 1)',
-                    transform: isHovered ? 'scale(1.1)' : 'scale(1)',
-                }}
-                priority={priority}
-            />
-            <div style={{
-                ...styles.overlay,
-                backgroundColor: isHovered ? 'rgba(0,0,0,0.2)' : 'transparent',
-            }} />
-            <div style={styles.content}>
-                <Title level={3} style={styles.title}>
-                    {item.title}
-                </Title>
-                <div style={styles.subTitleWrapper}>
-                    <Text style={styles.subTitle}>{item.subTitle}</Text>
-                    <RightOutlined style={styles.icon} />
-                </div>
-            </div>
-        </Link>
-    );
-};
-
-const { useBreakpoint } = Grid;
+import { ArrowRightOutlined } from '@ant-design/icons';
 
 export const HomeBanner = () => {
-    const screens = useBreakpoint();
-    const mounted = useSyncExternalStore(
-        () => () => { },
-        () => true,
-        () => false
-    );
+    const [isHovered, setIsHovered] = useState(false);
 
-    const isMobile = mounted ? !screens.md : false;
-
-    if (isMobile) {
-        return (
-            <section style={styles.bannerSection}>
-                <Carousel
-                    autoplay
-                    infinite
-                    draggable
-                    dots={{ className: 'custom-dots' }}
-                    autoplaySpeed={4000}
-                >
-                    {Object.values(BANNER_ITEMS).map((item, index) => (
-                        <div key={index}>
-                            <BannerCard item={item} height={500} />
-                        </div>
-                    ))}
-                </Carousel>
-            </section>
-        );
-    }
+    const scrollToCollections = () => {
+        const element = document.getElementById('home-collections');
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
 
     return (
         <section style={styles.bannerSection}>
-            <Row gutter={[12, 12]}>
-                {/* Cột trái & giữa: Chứa 4 ô (2x2) */}
-                <Col xs={24} md={16}>
-                    <Row gutter={[12, 12]}>
-                        <Col span={12}>
-                            <BannerCard item={BANNER_ITEMS.gam} height={400} priority />
-                        </Col>
-                        <Col span={12}>
-                            <BannerCard item={BANNER_ITEMS.voan} height={400} priority />
-                        </Col>
-                        <Col span={12}>
-                            <BannerCard item={BANNER_ITEMS.linen} height={400} />
-                        </Col>
-                        <Col span={12}>
-                            <BannerCard item={BANNER_ITEMS.lua} height={400} />
-                        </Col>
-                    </Row>
-                </Col>
+            <video
+                style={styles.video}
+                autoPlay
+                loop
+                muted
+                playsInline
+            >
+                <source src="/banner/video-banner.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+            </video>
+            <div style={styles.overlay} />
+            <div style={styles.content}>
+                <h1 style={styles.title}>FRABICS</h1>
+                <p style={styles.subtitle}>ELEGANCE IN EVERY THREAD</p>
 
-                {/* Cột phải: 1 ô cao bằng 2 ô bên trái cộng lại + gap */}
-                <Col xs={24} md={8}>
-                    <BannerCard item={BANNER_ITEMS.thun} height={812} />
-                </Col>
-            </Row>
+                <div
+                    style={{
+                        ...styles.buttonWrapper,
+                        width: isHovered ? '160px' : '100px',
+                    }}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    onClick={scrollToCollections}
+                >
+                    <div style={styles.buttonContent}>
+                        <span style={{
+                            ...styles.buttonText,
+                            opacity: isHovered ? 1 : 0,
+                            transform: isHovered ? 'translateX(0)' : 'translateX(-10px)',
+                        }}>
+                            Mua sắm
+                        </span>
+                        <div style={{
+                            ...styles.iconWrapper,
+                            position: 'absolute',
+                            right: isHovered ? '16px' : 'calc(50% - 12px)',
+                            transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                        }}>
+                            <ArrowRightOutlined style={styles.icon} />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
     );
 };
 
 const styles = StyleSheet.create({
     bannerSection: {
-        padding: '0',
-        maxWidth: '100%',
-        margin: '0 auto',
-    },
-    bannerCard: {
         position: 'relative',
-        display: 'block',
         width: '100%',
+        height: 'calc(100vh - 84px)',
         overflow: 'hidden',
-        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    video: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        minWidth: '100%',
+        minHeight: '100%',
+        width: 'auto',
+        height: 'auto',
+        transform: 'translate(-50%, -50%)',
+        objectFit: 'cover',
+        zIndex: 0,
     },
     overlay: {
         position: 'absolute',
         top: 0,
         left: 0,
-        right: 0,
-        bottom: 0,
-        transition: 'background 0.3s ease',
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.4)', // Tăng độ tối một chút để nổi bật nút trắng
+        zIndex: 1,
     },
     content: {
-        position: 'absolute',
-        bottom: '30px',
-        left: '30px',
+        position: 'relative',
         zIndex: 2,
+        textAlign: 'center',
+        color: '#ffffff',
     },
     title: {
-        color: '#FFFFFF',
-        marginBottom: '8px',
-        fontWeight: 500,
-        fontSize: '30px',
-        fontFamily: 'Gotham Book, sans-serif',
-        letterSpacing: '0.5px',
-        textAlign: 'left',
+        fontSize: '64px', // Tăng size cho sang trọng
+        fontWeight: 700,
+        letterSpacing: '12px',
+        margin: '0 0 16px 0',
+        fontFamily: 'Playfair Display, serif',
+        textTransform: 'uppercase',
     },
-    subTitleWrapper: {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
+    subtitle: {
+        fontSize: '16px',
+        fontWeight: 300,
+        letterSpacing: '6px',
+        margin: 0,
+        fontFamily: 'Gotham Book, sans-serif',
         opacity: 0.9,
     },
-    subTitle: {
-        color: '#FFFFFF',
+    buttonWrapper: {
+        marginTop: '40px',
+        height: '48px',
+        backgroundColor: '#F4EFE7',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        overflow: 'hidden',
+        transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        margin: '40px auto 0',
+    },
+    buttonContent: {
+        display: 'flex',
+        alignItems: 'center',
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+    },
+    buttonText: {
+        color: '#1a1a1a',
         fontSize: '14px',
-        fontWeight: 300,
-        fontFamily: 'Gotham Book, sans-serif',
-        letterSpacing: '0.5px',
-        textAlign: 'left',
+        fontWeight: 500,
+        letterSpacing: '1px',
+        whiteSpace: 'nowrap',
+        transition: 'all 0.4s ease',
+        position: 'absolute',
+        left: '24px',
+    },
+    iconWrapper: {
+        width: '24px',
+        height: '24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     icon: {
-        color: '#FFFFFF',
-        fontSize: '10px',
+        color: '#1a1a1a',
+        fontSize: '16px',
+
     }
 });
