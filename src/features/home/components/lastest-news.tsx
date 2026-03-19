@@ -9,9 +9,9 @@ import {
     CarOutlined,
     SyncOutlined,
     ShopOutlined,
-    LeftOutlined,
-    RightOutlined
 } from '@ant-design/icons';
+import { CarouselArrowButton } from '@/shared/components/ui/CarouselArrowButton';
+import { useScrollFadeIn } from '@/shared/hooks/useScrollFadeIn';
 
 const { Title, Text } = Typography;
 
@@ -72,18 +72,7 @@ const POLICY_DATA = [
 
 ];
 
-// Nút điều hướng custom cho Carousel
-const CarouselArrow = ({ type, onClick }: { type: 'prev' | 'next', onClick?: () => void }) => (
-    <div
-        onClick={onClick}
-        style={{
-            ...styles.arrow,
-            [type === 'prev' ? 'left' : 'right']: '-60px',
-        }}
-    >
-        {type === 'prev' ? <LeftOutlined /> : <RightOutlined />}
-    </div>
-);
+
 
 const NewsCardItem = ({ item }: { item: typeof NEWS_DATA[0] }) => {
     const [isHovered, setIsHovered] = React.useState(false);
@@ -154,8 +143,10 @@ const NewsCardItem = ({ item }: { item: typeof NEWS_DATA[0] }) => {
 };
 
 export const LatestNews = () => {
+    const { ref, animationStyle } = useScrollFadeIn(0.1);
+
     return (
-        <section style={styles.wrapper}>
+        <section ref={ref as React.RefObject<HTMLElement>} style={{ ...styles.wrapper, ...animationStyle }}>
             <div style={styles.container}>
                 {/* --- PHẦN 1: TIN TỨC --- */}
                 <div style={styles.header}>
@@ -168,13 +159,13 @@ export const LatestNews = () => {
                 <div style={styles.carouselWrapper}>
                     <Carousel
                         arrows
-                        prevArrow={<CarouselArrow type="prev" />}
-                        nextArrow={<CarouselArrow type="next" />}
+                        prevArrow={<CarouselArrowButton direction="left" style={{ left: '-60px' }} />}
+                        nextArrow={<CarouselArrowButton direction="right" style={{ right: '-60px' }} />}
                         dots={false}
                         slidesToShow={3}
                         slidesToScroll={1}
-                        infinite={false} // Tắt chế độ chạy vô hạn
-                        autoplay={false} // Tắt tự động chạy vì dữ liệu ít (chỉ 4 tin)
+                        infinite={false}
+                        autoplay={false}
                         draggable={true}
                         swipeToSlide={true}
                         responsive={[
@@ -219,7 +210,7 @@ const styles = StyleSheet.create({
     container: {
         maxWidth: '1200px',
         margin: '0 auto',
-        paddingBottom: '40px',
+        padding: '0 30px',
         display: 'block',
     },
     header: {
@@ -244,28 +235,7 @@ const styles = StyleSheet.create({
         marginBottom: '40px',
         padding: '0 10px',
     },
-    arrow: {
-        position: 'absolute',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        fontSize: '24px',
-        color: '#000',
-        cursor: 'pointer',
-        zIndex: 10,
-        width: '40px',
-        height: '40px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'rgba(255,255,255,0.8)',
-        borderRadius: '50%',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        transition: 'all 0.3s ease',
-        '&:hover': {
-            backgroundColor: '#000',
-            color: '#fff',
-        }
-    },
+
     newsCard: {
         display: 'flex',
         flexDirection: 'column',

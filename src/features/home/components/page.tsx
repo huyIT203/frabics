@@ -5,6 +5,7 @@ import { HomeBanner } from '@/features/home/components/banner';
 import { Homecollections } from '@/features/home/components/collections';
 import { FeaturedProducts } from '@/features/home/components/featured-products';
 import { NewArrivals } from '@/features/home/components/new-arrivals';
+import { VideoShowcase } from '@/features/home/components/video-showcase';
 import { LatestNews } from '@/features/home/components/lastest-news';
 
 export default function Home() {
@@ -12,6 +13,7 @@ export default function Home() {
         <main style={styles.main}>
             <HomeBanner />
             <NewArrivals />
+            <VideoShowcase />
             <FeaturedProducts />
             <LatestNews />
             <Homecollections />
@@ -23,5 +25,8 @@ const styles = StyleSheet.create({
     main: {
         width: '100%',
         backgroundColor: '#ffffff',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '30px',
     }
 });
