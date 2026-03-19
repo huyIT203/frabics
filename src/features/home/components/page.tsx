@@ -6,7 +6,7 @@ import { Homecollections } from '@/features/home/components/collections';
 import { FeaturedProducts } from '@/features/home/components/featured-products';
 import { NewArrivals } from '@/features/home/components/new-arrivals';
 import { VideoShowcase } from '@/features/home/components/video-showcase';
-import { LatestNews } from '@/features/home/components/lastest-news';
+import { FabricShowcase } from '@/features/home/components/fabric-showcase';
 
 export default function Home() {
     return (
@@ -15,8 +15,8 @@ export default function Home() {
             <NewArrivals />
             <VideoShowcase />
             <FeaturedProducts />
-            <LatestNews />
             <Homecollections />
+            <FabricShowcase />
         </main>
     );
 }

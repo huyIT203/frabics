@@ -2,9 +2,9 @@
 
 import React, { useState, useRef, useCallback, useSyncExternalStore } from 'react';
 import { Typography, Grid } from 'antd';
-import { PlayCircleFilled } from '@ant-design/icons';
+import { PlayCircleFilled, SoundOutlined } from '@ant-design/icons';
 import { StyleSheet } from '@/shared/utils/styles';
-import { useScrollFadeIn } from '@/shared/hooks/useScrollFadeIn';
+import { useScrollPopIn } from '@/shared/hooks/useScrollPopIn';
 
 const { Title } = Typography;
 const { useBreakpoint } = Grid;
@@ -16,7 +16,7 @@ const VIDEOS = [
 ];
 
 export const VideoShowcase = () => {
-    const { ref, isVisible } = useScrollFadeIn(0.1);
+    const { ref, popStyle, isVisible } = useScrollPopIn(0.1);
     const screens = useBreakpoint();
     const mounted = useSyncExternalStore(
         () => () => {},
@@ -29,6 +29,7 @@ export const VideoShowcase = () => {
     const [isHovered, setIsHovered] = useState(false);
     // Track which videos are currently playing (they keep playing even when swiped away)
     const [playingVideos, setPlayingVideos] = useState<Set<number>>(new Set());
+    const [mutedVideos, setMutedVideos] = useState<Set<number>>(new Set([0, 1, 2]));
     const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
     // Swipe handling
@@ -139,9 +140,7 @@ export const VideoShowcase = () => {
         <section ref={ref as React.RefObject<HTMLElement>} style={styles.container}>
             <div style={{
                 ...styles.header,
-                opacity: isVisible ? 1 : 0,
-                transform: isVisible ? 'scale(1)' : 'scale(0.6)',
-                transition: 'opacity 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                ...popStyle,
             }}>
                 <Title level={2} style={styles.mainTitle}>Chia Sẻ & Cảm Hứng</Title>
                 <div style={styles.subTitle}>Những khoảnh khắc ấn tượng từ Thiện Oanh</div>
@@ -195,10 +194,37 @@ export const VideoShowcase = () => {
                                     }}
                                     src={video.src}
                                     style={styles.videoElement}
-                                    muted={false}
+                                    muted={mutedVideos.has(index)}
                                     playsInline
                                     onEnded={() => handleVideoEnded(index)}
                                 />
+
+                                {/* Sound toggle - top left */}
+                                <div
+                                    style={styles.soundToggle}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setMutedVideos(prev => {
+                                            const next = new Set(prev);
+                                            if (next.has(index)) {
+                                                next.delete(index);
+                                            } else {
+                                                next.add(index);
+                                            }
+                                            return next;
+                                        });
+                                    }}
+                                >
+                                    {mutedVideos.has(index) ? (
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                            <line x1="23" y1="9" x2="17" y2="15" />
+                                            <line x1="17" y1="9" x2="23" y2="15" />
+                                        </svg>
+                                    ) : (
+                                        <SoundOutlined style={{ color: '#fff', fontSize: '18px' }} />
+                                    )}
+                                </div>
 
                                 {/* Overlay chỉ hiển thị Play icon khi chưa chạy */}
                                 <div style={{
@@ -337,6 +363,23 @@ const styles = StyleSheet.create({
         willChange: 'transform',
         backfaceVisibility: 'hidden',
         cursor: 'pointer',
+    },
+    soundToggle: {
+        position: 'absolute',
+        top: '12px',
+        left: '12px',
+        width: '36px',
+        height: '36px',
+        borderRadius: '50%',
+        backgroundColor: 'rgba(0, 0, 0, 0.45)',
+        backdropFilter: 'blur(8px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        zIndex: 10,
+        transition: 'background-color 0.3s ease, transform 0.2s ease',
+        pointerEvents: 'auto',
     },
     videoElement: {
         width: '100%',

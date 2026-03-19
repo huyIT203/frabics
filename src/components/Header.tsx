@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useSyncExternalStore } from 'react';
+import { useState, useSyncExternalStore, useEffect, useRef } from 'react';
 import { Layout, Menu, Button, Badge, Drawer, Grid, Typography } from 'antd';
 import {
     ShoppingCartOutlined,
@@ -11,6 +11,7 @@ import {
 import { StyleSheet } from '@/shared/utils/styles';
 import { useCartStore } from '@/store/useCartStore';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Logo } from '@/shared/components/brand/logo';
 import type { MenuProps } from 'antd';
 import { CartDrawer } from '@/components/CartDrawer';
@@ -46,7 +47,7 @@ const getMenuItems = (isProductOpen: boolean): MenuProps['items'] => [
         key: '2',
         label: (
             <span style={styles.menuLabelWithIcon}>
-                SẢN PHẨM
+                Sản phẩm
                 <DownOutlined
                     style={{
                         fontSize: '10px',
@@ -65,15 +66,15 @@ const getMenuItems = (isProductOpen: boolean): MenuProps['items'] => [
     },
     {
         key: '3',
-        label: <Link href="/blog" style={styles.menuLink}>BLOG</Link>
+        label: <Link href="/blog" style={styles.menuLink}>Blog</Link>
     },
     {
         key: '4',
-        label: <Link href="/about" style={styles.menuLink}>GIỚI THIỆU</Link>
+        label: <Link href="/about" style={styles.menuLink}>Giới thiệu</Link>
     },
     {
         key: '5',
-        label: <Link href="/contact" style={styles.menuLink}>LIÊN HỆ</Link>
+        label: <Link href="/contact" style={styles.menuLink}>Liên hệ</Link>
     },
 ];
 
@@ -93,6 +94,35 @@ export const Header = () => {
     const isDesktop = mounted ? (screens.md ?? true) : true;
     const isProductOpen = openKeys.includes('2');
 
+    // Detect current route for active menu item
+    const pathname = usePathname();
+    const getSelectedKey = () => {
+        if (pathname === '/') return ['1'];
+        if (pathname.startsWith('/products')) return ['2'];
+        if (pathname.startsWith('/blog')) return ['3'];
+        if (pathname.startsWith('/about')) return ['4'];
+        if (pathname.startsWith('/contact')) return ['5'];
+        return [];
+    };
+
+    // Scroll hide/show
+    const [headerVisible, setHeaderVisible] = useState(true);
+    const lastScrollY = useRef(0);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentY = window.scrollY;
+            if (currentY > lastScrollY.current && currentY > 100) {
+                setHeaderVisible(false); // cuộn xuống → ẩn
+            } else {
+                setHeaderVisible(true);  // cuộn lên → hiện
+            }
+            lastScrollY.current = currentY;
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     const onOpenChange: MenuProps['onOpenChange'] = (keys) => {
         const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1);
         if (latestOpenKey && latestOpenKey !== '2') {
@@ -108,6 +138,9 @@ export const Header = () => {
         <AntHeader style={{
             ...styles.headerContainer,
             padding: isDesktop ? '0 40px' : '0 16px',
+            transform: headerVisible ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(-120%)',
+            opacity: headerVisible ? 1 : 0,
+            transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease',
         }}>
             {/* KHỐI TRÁI: Logo cố định */}
             <div style={{
@@ -127,7 +160,7 @@ export const Header = () => {
                         <Menu
                             theme="light"
                             mode="horizontal"
-                            defaultSelectedKeys={['1']}
+                            selectedKeys={getSelectedKey()}
                             openKeys={openKeys}
                             onOpenChange={onOpenChange}
                             style={styles.desktopMenu}
@@ -150,12 +183,12 @@ export const Header = () => {
                         <Badge count={cartItems.length} showZero size="small" offset={[2, 0]}>
                             <ShoppingCartOutlined style={styles.actionIcon} />
                         </Badge>
-                        {isDesktop && <Text style={styles.actionText}>GIỎ HÀNG</Text>}
+                        {isDesktop && <Text style={styles.actionText}>Giỏ hàng</Text>}
                     </div>
 
                     <div style={styles.actionItem}>
                         <UserOutlined style={styles.actionIcon} />
-                        {isDesktop && <Text style={styles.actionText}>ĐĂNG NHẬP</Text>}
+                        {isDesktop && <Text style={styles.actionText}>Đăng nhập</Text>}
                     </div>
 
                     {!isDesktop && (
@@ -181,7 +214,7 @@ export const Header = () => {
             >
                 <Menu
                     mode="inline"
-                    defaultSelectedKeys={['1']}
+                    selectedKeys={getSelectedKey()}
                     openKeys={openKeys}
                     onOpenChange={onOpenChange}
                     items={menuItems}
@@ -194,6 +227,25 @@ export const Header = () => {
             </Drawer>
 
             <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+
+            {/* Selected = thick underline */}
+            <style>{`
+                .ant-menu-horizontal > .ant-menu-item::after,
+                .ant-menu-horizontal > .ant-menu-submenu::after {
+                    border-bottom-width: 3px !important;
+                    border-bottom-color: transparent !important;
+                }
+                .ant-menu-horizontal > .ant-menu-item-selected::after,
+                .ant-menu-horizontal > .ant-menu-submenu-selected::after {
+                    border-bottom-width: 3px !important;
+                    border-bottom-color: #1a1a1a !important;
+                }
+                .ant-menu-horizontal > .ant-menu-item:hover::after,
+                .ant-menu-horizontal > .ant-menu-submenu:hover::after {
+                    border-bottom-width: 3px !important;
+                    border-bottom-color: #1a1a1a !important;
+                }
+            `}</style>
         </AntHeader>
     );
 };
@@ -250,11 +302,9 @@ const styles = StyleSheet.create({
         lineHeight: '56px',
         border: 'none',
     },
-
     menuLink: {
         letterSpacing: '2px',
         fontWeight: 300,
-        textTransform: 'uppercase',
         fontSize: '13px',
     },
     menuLabelWithIcon: {
