@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useRef, useCallback, useSyncExternalStore } from 'react';
-import { Typography, Grid } from 'antd';
+import React, { useState, useRef, useCallback } from 'react';
+import { Typography } from 'antd';
 import { PlayCircleFilled, SoundOutlined } from '@ant-design/icons';
 import { StyleSheet } from '@/shared/utils/styles';
 import { useScrollPopIn } from '@/shared/hooks/useScrollPopIn';
+import { useResponsive } from '@/shared/hooks/useResponsive';
 
 const { Title } = Typography;
-const { useBreakpoint } = Grid;
 
 const VIDEOS = [
     { id: 1, src: '/video/video1.mp4', title: 'Story 1', color: '#B4D2C8' },
@@ -17,13 +17,7 @@ const VIDEOS = [
 
 export const VideoShowcase = () => {
     const { ref, popStyle, isVisible } = useScrollPopIn(0.1);
-    const screens = useBreakpoint();
-    const mounted = useSyncExternalStore(
-        () => () => {},
-        () => true,
-        () => false
-    );
-    const isDesktop = mounted ? (screens.md ?? true) : true;
+    const { isMobile, isDesktop } = useResponsive();
 
     const [activeIndex, setActiveIndex] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
@@ -137,17 +131,29 @@ export const VideoShowcase = () => {
     };
 
     return (
-        <section ref={ref as React.RefObject<HTMLElement>} style={styles.container}>
+        <section ref={ref as React.RefObject<HTMLElement>} style={{
+            ...styles.container,
+            width: isMobile ? 'calc(100% - 20px)' : 'calc(100% - 60px)',
+            padding: isMobile ? '30px 12px' : '60px 30px',
+            borderRadius: isMobile ? '20px' : '36px',
+        }}>
             <div style={{
                 ...styles.header,
                 ...popStyle,
             }}>
-                <Title level={2} style={styles.mainTitle}>Chia Sẻ & Cảm Hứng</Title>
-                <div style={styles.subTitle}>Những khoảnh khắc ấn tượng từ Thiện Oanh</div>
+                <Title level={2} style={{
+                    ...styles.mainTitle,
+                    fontSize: isMobile ? '28px' : '42px',
+                }}>Chia Sẻ & Cảm Hứng</Title>
+                <div style={{
+                    ...styles.subTitle,
+                    fontSize: isMobile ? '13px' : '15px',
+                }}>Những khoảnh khắc ấn tượng từ Thiện Oanh</div>
             </div>
 
             <div style={{
                 ...styles.contentWrapper,
+                minHeight: isMobile ? '400px' : '600px',
                 opacity: isVisible ? 1 : 0,
                 transform: isVisible ? 'scale(1)' : 'scale(0.6)',
                 transition: 'opacity 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s',
@@ -164,7 +170,8 @@ export const VideoShowcase = () => {
                 <div
                     style={{
                         ...styles.cardsContainer,
-                        height: isDesktop ? '560px' : '480px',
+                        height: isMobile ? '380px' : isDesktop ? '560px' : '480px',
+                        width: isMobile ? '240px' : '320px',
                         cursor: 'grab',
                     }}
                     onPointerDown={handlePointerDown}

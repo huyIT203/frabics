@@ -9,49 +9,81 @@ import { useScrollFadeIn } from '@/shared/hooks/useScrollFadeIn';
 import { ExploreButton } from '@/shared/components/ui/ExploreButton';
 import { MOCK_PRODUCTS } from '../data/products';
 import { CarouselRef } from 'antd/es/carousel';
+import { useResponsive } from '@/shared/hooks/useResponsive';
 
 export const FeaturedProducts = () => {
     const carouselRef = useRef<CarouselRef>(null);
     const { ref, animationStyle } = useScrollFadeIn(0.1);
+    const { isMobile } = useResponsive();
 
     return (
-        <section ref={ref as React.RefObject<HTMLElement>} style={{ ...styles.container, ...animationStyle }}>
-            {/* Tiêu đề phần Sản phẩm nổi bật */}
-            <div style={styles.header}>
+        <section ref={ref as React.RefObject<HTMLElement>} style={{
+            ...styles.container,
+            ...animationStyle,
+            padding: isMobile ? '0 12px' : '0 30px',
+        }}>
+            <div style={{
+                ...styles.header,
+                paddingLeft: isMobile ? '8px' : '20px',
+            }}>
                 <div style={styles.titleRow}>
-                    <Typography.Title level={2} style={styles.mainTitle}>Sản Phẩm Nổi Bật</Typography.Title>
-                    <ExploreButton variant="dark" />
+                    <Typography.Title level={2} style={{
+                        ...styles.mainTitle,
+                        fontSize: isMobile ? '28px' : '42px',
+                        margin: 0,
+                        lineHeight: 1,
+                    }}>Sản Phẩm Nổi Bật</Typography.Title>
+                    <ExploreButton variant="dark" size={isMobile ? 'small' : 'default'} isStatic={isMobile} />
                 </div>
-                <Typography.Text type="secondary" style={styles.subTitle}>
+                <Typography.Text type="secondary" style={{
+                    ...styles.subTitle,
+                    fontSize: isMobile ? '13px' : '15px',
+                }}>
                     Khám phá những mẫu vải được yêu thích nhất
                 </Typography.Text>
             </div>
 
-            {/* Danh sách sản phẩm với Carousel và nút điều hướng */}
-            <div style={styles.carouselWrapper}>
-                <CarouselArrowButton direction="left" onClick={() => carouselRef.current?.prev()} />
-
-                <Carousel
-                    ref={carouselRef}
-                    slidesToShow={4}
-                    slidesToScroll={1}
-                    dots={false}
-                    infinite={true}
-                    responsive={[
-                        { breakpoint: 1200, settings: { slidesToShow: 3 } },
-                        { breakpoint: 768, settings: { slidesToShow: 2 } },
-                        { breakpoint: 480, settings: { slidesToShow: 1 } },
-                    ]}
-                >
-                    {MOCK_PRODUCTS.map((product) => (
+            {isMobile ? (
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '12px',
+                    padding: '0 8px',
+                }}>
+                    {MOCK_PRODUCTS.slice(0, 6).map((product) => (
                         <div key={product.id}>
                             <ProductCard product={product} />
                         </div>
                     ))}
-                </Carousel>
+                </div>
+            ) : (
+                <div style={{
+                    ...styles.carouselWrapper,
+                    padding: '0 50px',
+                }}>
+                    <CarouselArrowButton direction="left" onClick={() => carouselRef.current?.prev()} />
 
-                <CarouselArrowButton direction="right" onClick={() => carouselRef.current?.next()} />
-            </div>
+                    <Carousel
+                        ref={carouselRef}
+                        slidesToShow={4}
+                        slidesToScroll={1}
+                        dots={false}
+                        infinite={true}
+                        responsive={[
+                            { breakpoint: 1200, settings: { slidesToShow: 3 } },
+                            { breakpoint: 768, settings: { slidesToShow: 2 } },
+                        ]}
+                    >
+                        {MOCK_PRODUCTS.map((product) => (
+                            <div key={product.id}>
+                                <ProductCard product={product} />
+                            </div>
+                        ))}
+                    </Carousel>
+
+                    <CarouselArrowButton direction="right" onClick={() => carouselRef.current?.next()} />
+                </div>
+            )}
         </section>
     );
 };

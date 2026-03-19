@@ -5,6 +5,7 @@ import { Typography } from 'antd';
 import { StyleSheet } from '@/shared/utils/styles';
 import Image from 'next/image';
 import { useScrollPopIn } from '@/shared/hooks/useScrollPopIn';
+import { useResponsive } from '@/shared/hooks/useResponsive';
 
 
 const { Title, Text } = Typography;
@@ -121,6 +122,7 @@ export const Homecollections = () => {
     const currentData = COLLECTIONS_DATA[activeKey] || COLLECTIONS_DATA.linen;
     const looks = currentData.looks;
     const { ref: popRef, popStyle } = useScrollPopIn(0.1);
+    const { isMobile } = useResponsive();
 
     // Swipe for looks slider
     const swipeStartX = useRef(0);
@@ -156,7 +158,7 @@ export const Homecollections = () => {
         const absDiff = Math.abs(diff);
 
         // Position: each card offset horizontally
-        const offsetX = diff * 450;
+        const offsetX = diff * (isMobile ? 160 : 450);
         // Scale: active is full, others shrink
         const scale = absDiff === 0 ? 1 : Math.max(0.7, 1 - absDiff * 0.12);
         // Opacity + blur: further = more faded
@@ -169,7 +171,7 @@ export const Homecollections = () => {
             position: 'absolute' as const,
             left: '50%',
             height: '100%',
-            width: '340px',
+            width: isMobile ? '220px' : '340px',
             transform: `translateX(calc(-50% + ${offsetX}px)) scale(${scale})`,
             opacity,
             filter: `blur(${blur}px)`,
@@ -180,19 +182,36 @@ export const Homecollections = () => {
     };
 
     return (
-        <section ref={popRef as React.RefObject<HTMLElement>} style={{ ...styles.section, ...popStyle }}>
-            {/* Content: Lookbook slider + Fabric info */}
-            <div style={styles.content}>
+        <section ref={popRef as React.RefObject<HTMLElement>} style={{
+            ...styles.section,
+            ...popStyle,
+            width: isMobile ? 'calc(100% - 20px)' : 'calc(100% - 60px)',
+            height: isMobile ? 'auto' : 'calc(100vh - 30px)',
+            borderRadius: isMobile ? '20px' : '36px',
+        }}>
+            <div style={{
+                ...styles.content,
+                flexDirection: isMobile ? 'column' : 'row',
+                padding: isMobile ? '16px' : '0 30px 30px',
+            }}>
                 {/* BÊN TRÁI: Look slider */}
                 <div
-                    style={styles.sliderArea}
+                    style={{
+                        ...styles.sliderArea,
+                        minHeight: isMobile ? '400px' : 'auto',
+                    }}
                     onPointerDown={handleSliderDown}
                     onPointerUp={handleSliderUp}
                 >
-                    {/* Tên bộ sưu tập ở trên */}
                     <div style={styles.lookHeader}>
-                        <Text style={styles.lookSeason}>BỘ SƯU TẬP 2026</Text>
-                        <Text style={styles.lookSubtext}>
+                        <Text style={{
+                            ...styles.lookSeason,
+                            fontSize: isMobile ? '14px' : '18px',
+                        }}>BỘ SƯU TẬP 2026</Text>
+                        <Text style={{
+                            ...styles.lookSubtext,
+                            fontSize: isMobile ? '12px' : '14px',
+                        }}>
                             Các thiết kế nổi bật sử dụng chất liệu {currentData.fabricName}
                         </Text>
                     </div>
@@ -209,7 +228,7 @@ export const Homecollections = () => {
                                     src={look.image}
                                     alt={look.label}
                                     fill
-                                    style={{ objectFit: 'cover', objectPosition: 'bottom' }}
+                                    style={{ objectFit: 'cover', objectPosition: isMobile ? 'top' : 'bottom' }}
                                 />
                             </div>
                         ))}
@@ -224,8 +243,10 @@ export const Homecollections = () => {
                     </div>
                 </div>
 
-                {/* BÊN PHẢI: Fabric info */}
-                <div style={styles.rightSide}>
+                <div style={{
+                    ...styles.rightSide,
+                    flex: isMobile ? 'none' : 0.8,
+                }}>
                     {/* Filter loại vải */}
                     <div style={styles.filterTabs}>
                         {CATEGORIES.map((cat) => (
@@ -242,7 +263,10 @@ export const Homecollections = () => {
                         ))}
                     </div>
 
-                    <div style={styles.fabricImageWrapper}>
+                    <div style={{
+                        ...styles.fabricImageWrapper,
+                        minHeight: isMobile ? '200px' : '0',
+                    }}>
                         <Image
                             src={currentData.fabricImage}
                             alt={currentData.fabricName}
@@ -251,28 +275,30 @@ export const Homecollections = () => {
                         />
                     </div>
 
-                    <div style={styles.fabricInfo}>
-                        <div style={styles.fabricLabelRow}>
-                            <div style={styles.fabricDot} />
-                            <span style={styles.fabricLabelText}>CHẤT LIỆU</span>
-                        </div>
-                        <Title level={2} style={styles.fabricName}>
-                            {currentData.fabricName}
-                        </Title>
-                        <Text style={styles.fabricDesc}>
-                            {currentData.fabricDesc}
-                        </Text>
+                    {!isMobile && (
+                        <div style={styles.fabricInfo}>
+                            <div style={styles.fabricLabelRow}>
+                                <div style={styles.fabricDot} />
+                                <span style={styles.fabricLabelText}>CHẤT LIỆU</span>
+                            </div>
+                            <Title level={2} style={styles.fabricName}>
+                                {currentData.fabricName}
+                            </Title>
+                            <Text style={styles.fabricDesc}>
+                                {currentData.fabricDesc}
+                            </Text>
 
-                        {/* Thông số vải */}
-                        <div style={styles.specsGrid}>
-                            {currentData.specs.map((spec, i) => (
-                                <div key={i} style={styles.specItem}>
-                                    <Text style={styles.specLabel}>{spec.label}</Text>
-                                    <Text style={styles.specValue}>{spec.value}</Text>
-                                </div>
-                            ))}
+                            {/* Thông số vải */}
+                            <div style={styles.specsGrid}>
+                                {currentData.specs.map((spec, i) => (
+                                    <div key={i} style={styles.specItem}>
+                                        <Text style={styles.specLabel}>{spec.label}</Text>
+                                        <Text style={styles.specValue}>{spec.value}</Text>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </section>

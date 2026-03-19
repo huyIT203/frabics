@@ -7,10 +7,16 @@ import { FeaturedProducts } from '@/features/home/components/featured-products';
 import { NewArrivals } from '@/features/home/components/new-arrivals';
 import { VideoShowcase } from '@/features/home/components/video-showcase';
 import { FabricShowcase } from '@/features/home/components/fabric-showcase';
+import { useResponsive } from '@/shared/hooks/useResponsive';
 
 export default function Home() {
+    const { isMobile } = useResponsive();
+
     return (
-        <main style={styles.main}>
+        <main style={{
+            ...styles.main,
+            gap: isMobile ? '16px' : '30px',
+        }}>
             <HomeBanner />
             <NewArrivals />
             <VideoShowcase />

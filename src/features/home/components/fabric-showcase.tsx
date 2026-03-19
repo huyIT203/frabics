@@ -5,6 +5,7 @@ import { StyleSheet } from '@/shared/utils/styles';
 import Image from 'next/image';
 import { ExploreButton } from '@/shared/components/ui/ExploreButton';
 import { useScrollPopIn } from '@/shared/hooks/useScrollPopIn';
+import { useResponsive } from '@/shared/hooks/useResponsive';
 
 const FABRIC_IMAGES = [
     '/collections/linen/linen.jpg',
@@ -26,11 +27,23 @@ const ANGLE_STEP = 360 / TOTAL; // 30° each
 
 export const FabricShowcase = () => {
     const { ref, popStyle } = useScrollPopIn(0.1);
+    const { isMobile } = useResponsive();
+
+    const cardWidth = isMobile ? 100 : 280;
+    const cardHeight = isMobile ? 65 : 170;
+    const orbitRadius = isMobile ? '80vw' : '45vw';
 
     return (
-        <section ref={ref as React.RefObject<HTMLElement>} style={{ ...styles.section, ...popStyle }}>
+        <section ref={ref as React.RefObject<HTMLElement>} style={{
+            ...styles.section,
+            ...popStyle,
+            height: isMobile ? '45vh' : '80vh',
+        }}>
             {/* Rotating circular loop */}
-            <div style={styles.orbitCenter}>
+            <div style={{
+                ...styles.orbitCenter,
+                top: isMobile ? '90%' : '120%',
+            }}>
                 <div className="fabric-orbit-ring" style={styles.orbitRing}>
                     {FABRIC_IMAGES.map((src, i) => {
                         const angle = i * ANGLE_STEP;
@@ -47,17 +60,16 @@ export const FabricShowcase = () => {
                                     transform: `rotate(${angle}deg)`,
                                 }}
                             >
-                                {/* Push outward by radius, then counter-rotate */}
                                 <div
                                     style={{
                                         position: 'absolute',
-                                        top: '-45vw', // radius
-                                        left: '-140px', // half card width
-                                        width: '280px',
-                                        height: '170px',
-                                        borderRadius: '24px',
+                                        top: `-${orbitRadius}`,
+                                        left: `${-cardWidth / 2}px`,
+                                        width: `${cardWidth}px`,
+                                        height: `${cardHeight}px`,
+                                        borderRadius: isMobile ? '16px' : '24px',
                                         overflow: 'hidden',
-                                        transform: 'none', // keep cards straight
+                                        transform: 'none',
                                         boxShadow: '0 6px 25px rgba(0,0,0,0.1)',
                                     }}
                                 >
@@ -75,12 +87,24 @@ export const FabricShowcase = () => {
             </div>
 
             {/* Fade edges */}
-            <div style={styles.fadeLeft} />
-            <div style={styles.fadeRight} />
+            <div style={{
+                ...styles.fadeLeft,
+                width: isMobile ? '80px' : '200px',
+            }} />
+            <div style={{
+                ...styles.fadeRight,
+                width: isMobile ? '80px' : '200px',
+            }} />
 
             {/* Center text */}
-            <div style={styles.centerContent}>
-                <h2 style={styles.title}>Khám phá bộ sưu tập</h2>
+            <div style={{
+                ...styles.centerContent,
+                marginTop: isMobile ? '25%' : '15%',
+            }}>
+                <h2 style={{
+                    ...styles.title,
+                    fontSize: isMobile ? '24px' : '42px',
+                }}>Khám phá bộ sưu tập</h2>
                 <ExploreButton variant="dark" />
             </div>
 

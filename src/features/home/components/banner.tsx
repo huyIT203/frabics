@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { StyleSheet } from '@/shared/utils/styles';
 import { ExploreButton } from '@/shared/components/ui/ExploreButton';
+import { useResponsive } from '@/shared/hooks/useResponsive';
 
 const TITLE_TEXT = 'Thiện Oanh';
 
@@ -50,9 +51,10 @@ export const HomeBanner = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const sectionRef = useRef<HTMLElement>(null);
+    const { isMobile, isTablet } = useResponsive();
 
     // Generate petals once
-    const petals = useMemo(() => generatePetals(15), []);
+    const petals = useMemo(() => generatePetals(isMobile ? 8 : 15), [isMobile]);
 
     // Initial mount animation
     useEffect(() => {
@@ -91,7 +93,12 @@ export const HomeBanner = () => {
     };
 
     return (
-        <section style={styles.bannerSection} ref={sectionRef}>
+        <section style={{
+            ...styles.bannerSection,
+            width: isMobile ? 'calc(100% - 20px)' : isTablet ? 'calc(100% - 40px)' : 'calc(100% - 60px)',
+            height: isMobile ? '70vh' : 'calc(100vh - 30px)',
+            borderRadius: isMobile ? '20px' : '36px',
+        }} ref={sectionRef}>
             {/* Full background image */}
             <div style={styles.bgImage} />
 
@@ -117,26 +124,33 @@ export const HomeBanner = () => {
                 />
             ))}
 
-            {/* Mouse-following soft light */}
-            <div
-                style={{
-                    position: 'absolute',
-                    width: '500px',
-                    height: '500px',
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(255, 230, 210, 0.2) 0%, transparent 70%)',
-                    pointerEvents: 'none',
-                    zIndex: 3,
-                    left: `calc(${(mousePos.x + 0.5) * 100}% - 250px)`,
-                    top: `calc(${(mousePos.y + 0.5) * 100}% - 250px)`,
-                    transition: 'left 0.6s ease-out, top 0.6s ease-out',
-                }}
-            />
+            {/* Mouse-following soft light - hide on mobile */}
+            {!isMobile && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        width: '500px',
+                        height: '500px',
+                        borderRadius: '50%',
+                        background: 'radial-gradient(circle, rgba(255, 230, 210, 0.2) 0%, transparent 70%)',
+                        pointerEvents: 'none',
+                        zIndex: 3,
+                        left: `calc(${(mousePos.x + 0.5) * 100}% - 250px)`,
+                        top: `calc(${(mousePos.y + 0.5) * 100}% - 250px)`,
+                        transition: 'left 0.6s ease-out, top 0.6s ease-out',
+                    }}
+                />
+            )}
 
-            {/* Text + Button - left center area */}
+            {/* Text + Button */}
             <div
                 style={{
                     ...styles.leftContent,
+                    left: isMobile ? '20px' : isTablet ? '40px' : '360px',
+                    right: isMobile ? '20px' : 'auto',
+                    maxWidth: isMobile ? 'none' : '480px',
+                    justifyContent: isMobile ? 'flex-end' : 'center',
+                    paddingBottom: isMobile ? '60px' : 0,
                     ...textParallax,
                     animation: isVisible
                         ? 'fadeInUp 1s ease-out 0.3s forwards'
@@ -144,12 +158,18 @@ export const HomeBanner = () => {
                     opacity: 0,
                 }}
             >
-                {/* Title: Thiện Oanh in Alex Brush */}
+                {/* Title */}
                 <div style={styles.textBlock}>
-                    <h1 style={styles.titleAlexBrush}>
+                    <h1 style={{
+                        ...styles.titleAlexBrush,
+                        fontSize: isMobile ? '48px' : isTablet ? '72px' : '100px',
+                    }}>
                         {TITLE_TEXT}
                     </h1>
-                    <p style={styles.subtitle}>
+                    <p style={{
+                        ...styles.subtitle,
+                        fontSize: isMobile ? '13px' : '16px',
+                    }}>
                         Vải vóc độc đáo, kết hợp nghệ thuật dệt & tư duy thiết kế.
                         <br />
                         Nâng tầm không gian sống.

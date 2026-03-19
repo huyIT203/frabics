@@ -8,21 +8,30 @@ interface ExploreButtonProps {
     label?: string;
     onClick?: () => void;
     variant?: 'light' | 'dark';
+    size?: 'small' | 'default';
+    isStatic?: boolean;
 }
 
 export const ExploreButton: React.FC<ExploreButtonProps> = ({
     label = 'Khám phá',
     onClick,
     variant = 'dark',
+    size = 'default',
+    isStatic = false,
 }) => {
     const [isHovered, setIsHovered] = useState(false);
 
     const isLight = variant === 'light';
+    const isSmall = size === 'small';
+    const btnHeight = isSmall ? '32px' : '48px';
+    const btnCollapsed = isSmall ? '32px' : '48px';
+    const btnExpanded = isSmall ? '140px' : '180px';
 
     return (
         <div
             style={{
                 ...styles.wrapper,
+                height: btnHeight,
                 backgroundColor: isLight
                     ? 'rgba(255, 255, 255, 0.85)'
                     : 'rgba(26, 26, 26, 0.9)',
@@ -30,10 +39,10 @@ export const ExploreButton: React.FC<ExploreButtonProps> = ({
                     ? '0 4px 20px rgba(120, 80, 30, 0.12)'
                     : '0 4px 20px rgba(0, 0, 0, 0.15)',
                 backdropFilter: isLight ? 'blur(10px)' : undefined,
-                width: isHovered ? '180px' : '48px',
+                width: isStatic ? btnCollapsed : (isHovered ? btnExpanded : btnCollapsed),
             }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+            onMouseEnter={() => !isStatic && setIsHovered(true)}
+            onMouseLeave={() => !isStatic && setIsHovered(false)}
             onClick={onClick}
         >
             <div style={styles.content}>
@@ -58,7 +67,7 @@ export const ExploreButton: React.FC<ExploreButtonProps> = ({
                     <ArrowRightOutlined
                         style={{
                             color: isLight ? '#4A3520' : '#ffffff',
-                            fontSize: '16px',
+                            fontSize: isSmall ? '12px' : '16px',
                         }}
                     />
                 </div>
