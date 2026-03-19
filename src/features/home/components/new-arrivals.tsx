@@ -5,6 +5,7 @@ import { Typography, Carousel } from 'antd';
 import { CarouselArrowButton } from '@/shared/components/ui/CarouselArrowButton';
 import { ProductCard } from '@/shared/components/ui/ProductCard';
 import { useScrollFadeIn } from '@/shared/hooks/useScrollFadeIn';
+import { ExploreButton } from '@/shared/components/ui/ExploreButton';
 import { StyleSheet } from '@/shared/utils/styles';
 import { MOCK_PRODUCTS } from '../data/products';
 import { CarouselRef } from 'antd/es/carousel';
@@ -18,9 +19,11 @@ export const NewArrivals = () => {
     return (
         <section ref={ref as React.RefObject<HTMLElement>} style={{ ...styles.container, ...animationStyle }}>
             <div style={styles.header}>
-                <div style={styles.titleWrapper}>
+                <div style={styles.titleRow}>
                     <Title level={2} style={styles.title}>
-                        Hàng Mới                    </Title>
+                        Hàng Mới
+                    </Title>
+                    <ExploreButton variant="dark" />
                 </div>
                 <Text style={styles.subTitle}>
                     Thời trang luôn thay đổi&mdash;đó là lý do tại sao Thiện Oanh có hàng trăm sản phẩm mới mỗi tuần!
@@ -65,14 +68,17 @@ const styles = StyleSheet.create({
         marginBottom: '20px',
         paddingLeft: '20px',
     },
-    titleWrapper: {
+    titleRow: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '16px',
         marginBottom: '10px',
     },
     title: {
         fontSize: '42px',
         fontFamily: 'Playfair Display',
         fontWeight: 100,
-        marginBottom: '15px',
+        marginBottom: '0px !important',
         color: '#000000',
     },
     subTitle: {

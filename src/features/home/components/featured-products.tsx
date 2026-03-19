@@ -6,6 +6,7 @@ import { StyleSheet } from '@/shared/utils/styles';
 import { CarouselArrowButton } from '@/shared/components/ui/CarouselArrowButton';
 import { ProductCard } from '@/shared/components/ui/ProductCard';
 import { useScrollFadeIn } from '@/shared/hooks/useScrollFadeIn';
+import { ExploreButton } from '@/shared/components/ui/ExploreButton';
 import { MOCK_PRODUCTS } from '../data/products';
 import { CarouselRef } from 'antd/es/carousel';
 
@@ -17,7 +18,10 @@ export const FeaturedProducts = () => {
         <section ref={ref as React.RefObject<HTMLElement>} style={{ ...styles.container, ...animationStyle }}>
             {/* Tiêu đề phần Sản phẩm nổi bật */}
             <div style={styles.header}>
-                <Typography.Title level={2} style={styles.mainTitle}>Sản Phẩm Nổi Bật</Typography.Title>
+                <div style={styles.titleRow}>
+                    <Typography.Title level={2} style={styles.mainTitle}>Sản Phẩm Nổi Bật</Typography.Title>
+                    <ExploreButton variant="dark" />
+                </div>
                 <Typography.Text type="secondary" style={styles.subTitle}>
                     Khám phá những mẫu vải được yêu thích nhất
                 </Typography.Text>
@@ -62,10 +66,15 @@ const styles = StyleSheet.create({
         marginBottom: '20px',
         paddingLeft: '20px',
     },
+    titleRow: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '16px',
+    },
     mainTitle: {
         fontSize: '42px',
         fontWeight: 100,
-        marginBottom: '15px',
+        marginBottom: '0px !important',
         fontFamily: 'Playfair Display',
         color: '#000000',
     },

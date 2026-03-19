@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { StyleSheet } from '@/shared/utils/styles';
-import { ArrowRightOutlined } from '@ant-design/icons';
+import { ExploreButton } from '@/shared/components/ui/ExploreButton';
 
 const TITLE_TEXT = 'Thiện Oanh';
 
@@ -47,7 +47,6 @@ const generatePetals = (count: number): Petal[] => {
 };
 
 export const HomeBanner = () => {
-    const [isHovered, setIsHovered] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const sectionRef = useRef<HTMLElement>(null);
@@ -158,33 +157,7 @@ export const HomeBanner = () => {
                 </div>
 
                 {/* CTA Button */}
-                <div
-                    style={{
-                        ...styles.buttonWrapper,
-                        width: isHovered ? '180px' : '120px',
-                    }}
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
-                    onClick={scrollToCollections}
-                >
-                    <div style={styles.buttonContent}>
-                        <span style={{
-                            ...styles.buttonText,
-                            opacity: isHovered ? 1 : 0,
-                            transform: isHovered ? 'translateX(0)' : 'translateX(-10px)',
-                        }}>
-                            Khám phá
-                        </span>
-                        <div style={{
-                            ...styles.iconWrapper,
-                            position: 'absolute' as const,
-                            right: isHovered ? '16px' : 'calc(50% - 12px)',
-                            transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                        }}>
-                            <ArrowRightOutlined style={styles.icon} />
-                        </div>
-                    </div>
-                </div>
+                <ExploreButton variant="light" onClick={scrollToCollections} />
             </div>
         </section>
     );
@@ -249,47 +222,5 @@ const styles = StyleSheet.create({
         margin: 0,
         fontFamily: "'Inter', sans-serif",
         color: '#5C4433',
-    },
-    buttonWrapper: {
-        height: '48px',
-        backgroundColor: 'rgba(255, 255, 255, 0.85)',
-        borderRadius: '30px',
-        cursor: 'pointer',
-        overflow: 'hidden',
-        transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-        boxShadow: '0 4px 20px rgba(120, 80, 30, 0.12)',
-        backdropFilter: 'blur(10px)',
-    },
-    buttonContent: {
-        display: 'flex',
-        alignItems: 'center',
-        width: '100%',
-        height: '100%',
-        position: 'relative',
-    },
-    buttonText: {
-        color: '#4A3520',
-        fontSize: '14px',
-        fontWeight: 500,
-        letterSpacing: '1px',
-        whiteSpace: 'nowrap',
-        transition: 'all 0.4s ease',
-        position: 'absolute',
-        left: '24px',
-    },
-    iconWrapper: {
-        width: '24px',
-        height: '24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    icon: {
-        color: '#4A3520',
-        fontSize: '16px',
     },
 });
