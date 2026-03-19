@@ -1,11 +1,83 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { StyleSheet } from '@/shared/utils/styles';
 import { ArrowRightOutlined } from '@ant-design/icons';
 
+const TITLE_TEXT = 'Thiện Oanh';
+
+// Petal configuration
+const PETAL_COLORS = [
+    'rgba(244, 180, 160, 0.6)',   // soft peach
+    'rgba(230, 200, 170, 0.5)',   // warm cream
+    'rgba(220, 160, 140, 0.4)',   // dusty rose
+    'rgba(200, 190, 230, 0.3)',   // soft lavender
+    'rgba(180, 210, 200, 0.35)',  // mint
+    'rgba(250, 220, 180, 0.4)',   // warm yellow
+];
+
+interface Petal {
+    id: number;
+    left: string;
+    bottom: string;
+    size: number;
+    color: string;
+    delay: number;
+    duration: number;
+    driftX: number;
+    driftY: number;
+    spin: number;
+    shape: 'circle' | 'ellipse';
+}
+
+const generatePetals = (count: number): Petal[] => {
+    return Array.from({ length: count }, (_, i) => ({
+        id: i,
+        left: `${Math.random() * 100}%`,
+        bottom: `${-5 - Math.random() * 10}%`,
+        size: 6 + Math.random() * 14,
+        color: PETAL_COLORS[Math.floor(Math.random() * PETAL_COLORS.length)],
+        delay: Math.random() * 12,
+        duration: 8 + Math.random() * 10,
+        driftX: -80 + Math.random() * 160,
+        driftY: -(300 + Math.random() * 400),
+        spin: 180 + Math.random() * 360,
+        shape: Math.random() > 0.5 ? 'circle' : 'ellipse',
+    }));
+};
+
 export const HomeBanner = () => {
     const [isHovered, setIsHovered] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const sectionRef = useRef<HTMLElement>(null);
+
+    // Generate petals once
+    const petals = useMemo(() => generatePetals(15), []);
+
+    // Initial mount animation
+    useEffect(() => {
+        const timer = setTimeout(() => setIsVisible(true), 100);
+        return () => clearTimeout(timer);
+    }, []);
+
+    // Mouse parallax tracking
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (sectionRef.current) {
+                const rect = sectionRef.current.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width - 0.5;
+                const y = (e.clientY - rect.top) / rect.height - 0.5;
+                setMousePos({ x, y });
+            }
+        };
+
+        const section = sectionRef.current;
+        if (section) {
+            section.addEventListener('mousemove', handleMouseMove);
+            return () => section.removeEventListener('mousemove', handleMouseMove);
+        }
+    }, []);
 
     const scrollToCollections = () => {
         const element = document.getElementById('home-collections');
@@ -14,27 +86,82 @@ export const HomeBanner = () => {
         }
     };
 
-    return (
-        <section style={styles.bannerSection}>
-            <video
-                style={styles.video}
-                autoPlay
-                loop
-                muted
-                playsInline
-            >
-                <source src="/banner/video-banner.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-            </video>
-            <div style={styles.overlay} />
-            <div style={styles.content}>
-                <h1 style={styles.title}>FRABICS</h1>
-                <p style={styles.subtitle}>ELEGANCE IN EVERY THREAD</p>
+    const textParallax = {
+        transform: `translate(${mousePos.x * 8}px, ${mousePos.y * 5}px)`,
+        transition: 'transform 0.4s ease-out',
+    };
 
+    return (
+        <section style={styles.bannerSection} ref={sectionRef}>
+            {/* Full background image */}
+            <div style={styles.bgImage} />
+
+            {/* Floating Petals */}
+            {petals.map((petal) => (
+                <div
+                    key={petal.id}
+                    style={{
+                        position: 'absolute',
+                        left: petal.left,
+                        bottom: petal.bottom,
+                        width: `${petal.size}px`,
+                        height: petal.shape === 'ellipse' ? `${petal.size * 0.6}px` : `${petal.size}px`,
+                        backgroundColor: petal.color,
+                        borderRadius: petal.shape === 'ellipse' ? '50% 50% 50% 20%' : '50%',
+                        zIndex: 3,
+                        pointerEvents: 'none',
+                        animation: `floatPetal ${petal.duration}s ease-in-out ${petal.delay}s infinite`,
+                        ['--drift-x' as string]: `${petal.driftX}px`,
+                        ['--drift-y' as string]: `${petal.driftY}px`,
+                        ['--spin' as string]: `${petal.spin}deg`,
+                    } as React.CSSProperties}
+                />
+            ))}
+
+            {/* Mouse-following soft light */}
+            <div
+                style={{
+                    position: 'absolute',
+                    width: '500px',
+                    height: '500px',
+                    borderRadius: '50%',
+                    background: 'radial-gradient(circle, rgba(255, 230, 210, 0.2) 0%, transparent 70%)',
+                    pointerEvents: 'none',
+                    zIndex: 3,
+                    left: `calc(${(mousePos.x + 0.5) * 100}% - 250px)`,
+                    top: `calc(${(mousePos.y + 0.5) * 100}% - 250px)`,
+                    transition: 'left 0.6s ease-out, top 0.6s ease-out',
+                }}
+            />
+
+            {/* Text + Button - left center area */}
+            <div
+                style={{
+                    ...styles.leftContent,
+                    ...textParallax,
+                    animation: isVisible
+                        ? 'fadeInUp 1s ease-out 0.3s forwards'
+                        : 'none',
+                    opacity: 0,
+                }}
+            >
+                {/* Title: Thiện Oanh in Alex Brush */}
+                <div style={styles.textBlock}>
+                    <h1 style={styles.titleAlexBrush}>
+                        {TITLE_TEXT}
+                    </h1>
+                    <p style={styles.subtitle}>
+                        Vải vóc độc đáo, kết hợp nghệ thuật dệt & tư duy thiết kế.
+                        <br />
+                        Nâng tầm không gian sống.
+                    </p>
+                </div>
+
+                {/* CTA Button */}
                 <div
                     style={{
                         ...styles.buttonWrapper,
-                        width: isHovered ? '160px' : '100px',
+                        width: isHovered ? '180px' : '120px',
                     }}
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
@@ -46,11 +173,11 @@ export const HomeBanner = () => {
                             opacity: isHovered ? 1 : 0,
                             transform: isHovered ? 'translateX(0)' : 'translateX(-10px)',
                         }}>
-                            Mua sắm
+                            Khám phá
                         </span>
                         <div style={{
                             ...styles.iconWrapper,
-                            position: 'absolute',
+                            position: 'absolute' as const,
                             right: isHovered ? '16px' : 'calc(50% - 12px)',
                             transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
                         }}>
@@ -66,69 +193,76 @@ export const HomeBanner = () => {
 const styles = StyleSheet.create({
     bannerSection: {
         position: 'relative',
-        width: '100%',
-        height: 'calc(100vh - 84px)',
+        width: 'calc(100% - 60px)',
+        height: 'calc(100vh - 30px)',
+        margin: '0 auto',
         overflow: 'hidden',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        marginTop: '10px',
+        cursor: 'default',
+        borderRadius: '36px',
     },
-    video: {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        minWidth: '100%',
-        minHeight: '100%',
-        width: 'auto',
-        height: 'auto',
-        transform: 'translate(-50%, -50%)',
-        objectFit: 'cover',
-        zIndex: 0,
-    },
-    overlay: {
+    bgImage: {
         position: 'absolute',
         top: 0,
         left: 0,
         width: '100%',
         height: '100%',
-        backgroundColor: 'rgba(0, 0, 0, 0.4)', // Tăng độ tối một chút để nổi bật nút trắng
-        zIndex: 1,
+        backgroundImage: 'url(/banner/fabrics.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        zIndex: 0,
     },
-    content: {
-        position: 'relative',
-        zIndex: 2,
-        textAlign: 'center',
-        color: '#ffffff',
+    leftContent: {
+        position: 'absolute',
+        top: 0,
+        left: '360px',
+        height: '100%',
+        zIndex: 5,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        gap: '28px',
+        maxWidth: '480px',
     },
-    title: {
-        fontSize: '64px', // Tăng size cho sang trọng
-        fontWeight: 700,
-        letterSpacing: '12px',
-        margin: '0 0 16px 0',
-        fontFamily: 'Playfair Display, serif',
-        textTransform: 'uppercase',
+    textBlock: {
+        textAlign: 'left',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+    },
+    titleAlexBrush: {
+        fontSize: '100px',
+        fontWeight: 400,
+        letterSpacing: '2px',
+        margin: 0,
+        fontFamily: "'Alex Brush', cursive",
+        color: '#4A3520',
+        lineHeight: 1.1,
     },
     subtitle: {
         fontSize: '16px',
-        fontWeight: 300,
-        letterSpacing: '6px',
+        fontWeight: 400,
+        letterSpacing: '0.5px',
+        lineHeight: 1.7,
         margin: 0,
-        fontFamily: 'Gotham Book, sans-serif',
-        opacity: 0.9,
+        fontFamily: "'Inter', sans-serif",
+        color: '#5C4433',
     },
     buttonWrapper: {
-        marginTop: '40px',
         height: '48px',
-        backgroundColor: '#F4EFE7',
-        borderRadius: '4px',
+        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+        borderRadius: '30px',
         cursor: 'pointer',
         overflow: 'hidden',
-        transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+        transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
-        margin: '40px auto 0',
+        boxShadow: '0 4px 20px rgba(120, 80, 30, 0.12)',
+        backdropFilter: 'blur(10px)',
     },
     buttonContent: {
         display: 'flex',
@@ -138,7 +272,7 @@ const styles = StyleSheet.create({
         position: 'relative',
     },
     buttonText: {
-        color: '#1a1a1a',
+        color: '#4A3520',
         fontSize: '14px',
         fontWeight: 500,
         letterSpacing: '1px',
@@ -155,8 +289,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     icon: {
-        color: '#1a1a1a',
+        color: '#4A3520',
         fontSize: '16px',
-
-    }
+    },
 });

@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     bannerSection: {
         width: '100%',
         margin: '0 auto',
-        padding: '20px 0',
+        padding: '20px 30px',
         background: 'linear-gradient(to right, #87693e9f 66.7%, #F4EFE7 66.6%)',
     },
     bannerCard: {

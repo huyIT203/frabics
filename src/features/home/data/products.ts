@@ -74,4 +74,4 @@ export const MOCK_PRODUCTS: Product[] = [
     ...FEATURED_PRODUCTS_DATA.map(p => ({ ...p, id: p.id + 5, slug: `${p.slug}-2` })),
     ...FEATURED_PRODUCTS_DATA.map(p => ({ ...p, id: p.id + 10, slug: `${p.slug}-3` })),
     ...FEATURED_PRODUCTS_DATA.map(p => ({ ...p, id: p.id + 15, slug: `${p.slug}-4` })),
-].slice(0, 5);
+].slice(0, 10);

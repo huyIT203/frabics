@@ -1,13 +1,12 @@
 'use client';
 
 import { useState, useSyncExternalStore } from 'react';
-import { Layout, Menu, Button, Badge, Drawer, Grid, Input, Typography } from 'antd'; // Thêm Input, Typography
+import { Layout, Menu, Button, Badge, Drawer, Grid, Typography } from 'antd';
 import {
     ShoppingCartOutlined,
     UserOutlined,
     DownOutlined,
     MenuOutlined,
-    SearchOutlined
 } from '@ant-design/icons';
 import { StyleSheet } from '@/shared/utils/styles';
 import { useCartStore } from '@/store/useCartStore';
@@ -84,7 +83,7 @@ export const Header = () => {
     const [openKeys, setOpenKeys] = useState<string[]>([]);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     // const [cartOpen, setCartOpen] = useState(false); // Đã chuyển sang store
-    const [isSearchFocused, setIsSearchFocused] = useState(false);
+
     const mounted = useSyncExternalStore(
         () => () => { },
         () => true,
@@ -124,15 +123,7 @@ export const Header = () => {
             {/* KHỐI GIỮA: Chứa Menu và Search tương tác với nhau */}
             {isDesktop && (
                 <div style={styles.centerSection}>
-                    {/* Menu Điều hướng: Co lại khi search được focus */}
-                    <div style={{
-                        ...styles.menuWrapper,
-                        flex: isSearchFocused ? 0 : 1,
-                        opacity: isSearchFocused ? 0 : 1,
-                        visibility: isSearchFocused ? 'hidden' : 'visible',
-                        transform: isSearchFocused ? 'translateX(-20px)' : 'translateX(0)',
-                        overflow: 'hidden',
-                    }}>
+                    <div style={styles.menuWrapper}>
                         <Menu
                             theme="light"
                             mode="horizontal"
@@ -143,22 +134,6 @@ export const Header = () => {
                             items={menuItems}
                             expandIcon={null}
                             triggerSubMenuAction="hover"
-                        />
-                    </div>
-
-                    {/* Thanh tìm kiếm: Tự động dài ra */}
-                    <div style={{
-                        ...styles.searchWrapper,
-                        flex: isSearchFocused ? 1 : '0 0 340px',
-                        maxWidth: isSearchFocused ? '100%' : '340px',
-                    }}>
-                        <Input
-                            placeholder="Tìm kiếm sản phẩm..."
-                            prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-                            style={styles.searchInput}
-                            onFocus={() => setIsSearchFocused(true)}
-                            onBlur={() => setIsSearchFocused(false)}
-                            allowClear
                         />
                     </div>
                 </div>
@@ -200,7 +175,7 @@ export const Header = () => {
                 placement="right"
                 onClose={() => setMobileMenuOpen(false)}
                 open={mobileMenuOpen}
-                width={280}
+                size="default"
                 styles={{ body: { padding: 0 } }}
                 destroyOnClose
             >
@@ -229,13 +204,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         backgroundColor: '#FFFFFF',
-        padding: '0 40px',
-        height: '84px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        position: 'sticky',
-        top: 0,
+        padding: '0 32px',
+        height: '80px',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+        position: 'fixed',
+        top: '20px',
+        left: '50%',
+        transform: 'translateX(-50%)',
         zIndex: 1000,
-        width: '100%',
+        width: '1200px',
+        maxWidth: 'calc(100% - 24px)',
+        borderRadius: '36px',
     },
     leftSection: {
         display: 'flex',
@@ -261,28 +240,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: 'auto',
     },
-    searchWrapper: {
-        flexShrink: 0,
-        marginLeft: '20px',
-        marginRight: '20px',
-        transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-        display: 'flex',
-        justifyContent: 'flex-end',
-    },
-    searchInput: {
-        borderRadius: '20px',
-        backgroundColor: '#f5f5f5',
-        border: 'none',
-        height: '36px',
-        width: '100%',
-    },
+
     desktopMenu: {
         display: 'flex',
         justifyContent: 'center',
         minWidth: 0,
         backgroundColor: 'transparent',
         borderBottom: 'none',
-        lineHeight: '84px',
+        lineHeight: '56px',
         border: 'none',
     },
 
@@ -302,7 +267,6 @@ const styles = StyleSheet.create({
     },
     menuWrapper: {
         flex: 1,
-        transition: 'all 0.3s ease',
     },
     subMenuItem: {
         height: '40px',

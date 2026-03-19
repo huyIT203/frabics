@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { StyleSheet } from '@/shared/utils/styles';
 
 const LOGO_WIDTH = 200;
-const LOGO_HEIGHT = 180;
+const LOGO_HEIGHT = 200;
 
 interface LogoProps {
     style?: React.CSSProperties;
