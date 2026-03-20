@@ -105,7 +105,7 @@ export const FabricShowcase = () => {
                     ...styles.title,
                     fontSize: isMobile ? '24px' : '42px',
                 }}>Khám phá bộ sưu tập</h2>
-                <ExploreButton variant="dark" />
+                <ExploreButton variant="dark" href="/san-pham/bo-suu-tap" />
             </div>
 
             {/* Slow rotation animation */}

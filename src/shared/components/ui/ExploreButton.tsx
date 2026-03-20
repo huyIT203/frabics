@@ -3,10 +3,12 @@
 import React, { useState } from 'react';
 import { StyleSheet } from '@/shared/utils/styles';
 import { ArrowRightOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
 
 interface ExploreButtonProps {
     label?: string;
     onClick?: () => void;
+    href?: string;
     variant?: 'light' | 'dark';
     size?: 'small' | 'default';
     isStatic?: boolean;
@@ -15,17 +17,24 @@ interface ExploreButtonProps {
 export const ExploreButton: React.FC<ExploreButtonProps> = ({
     label = 'Khám phá',
     onClick,
+    href,
     variant = 'dark',
     size = 'default',
     isStatic = false,
 }) => {
     const [isHovered, setIsHovered] = useState(false);
+    const router = useRouter();
 
     const isLight = variant === 'light';
     const isSmall = size === 'small';
     const btnHeight = isSmall ? '32px' : '48px';
     const btnCollapsed = isSmall ? '32px' : '48px';
     const btnExpanded = isSmall ? '140px' : '180px';
+
+    const handleClick = () => {
+        if (onClick) onClick();
+        if (href) router.push(href);
+    };
 
     return (
         <div
@@ -43,7 +52,7 @@ export const ExploreButton: React.FC<ExploreButtonProps> = ({
             }}
             onMouseEnter={() => !isStatic && setIsHovered(true)}
             onMouseLeave={() => !isStatic && setIsHovered(false)}
-            onClick={onClick}
+            onClick={handleClick}
         >
             <div style={styles.content}>
                 <span

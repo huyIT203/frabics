@@ -5,8 +5,9 @@ import { Typography, Button, Tooltip, Grid } from 'antd';
 import { EyeOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { StyleSheet } from '@/shared/utils/styles';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Product } from '@/features/home/data/products';
-import { useCartStore } from '@/store/useCartStore';
+import { AddToCartModal } from './AddToCartModal';
 
 const { useBreakpoint } = Grid;
 const { Text } = Typography;
@@ -16,12 +17,15 @@ const formatPrice = (price: number) => {
 };
 
 export const ProductCard = ({ product }: { product: Product }) => {
-    const addToCart = useCartStore((state) => state.addToCart);
     const screens = useBreakpoint();
     const isDesktop = screens.md;
+    const router = useRouter();
 
     const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
     const [isHovered, setIsHovered] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
+
+    const goToDetail = () => router.push(`/san-pham/${product.slug}`);
 
     return (
         <div
@@ -29,11 +33,33 @@ export const ProductCard = ({ product }: { product: Product }) => {
                 ...styles.cardContainer,
                 background: isHovered ? 'linear-gradient(to bottom, #ffffff, #F4EFE7)' : 'transparent',
                 zIndex: isHovered ? 2 : 1,
+                cursor: 'default',
             }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onDoubleClick={goToDetail}
         >
             <div style={styles.imageWrapper}>
+                {/* Badge */}
+                {product.badge && (
+                    <div style={{
+                        position: 'absolute',
+                        top: '10px',
+                        left: '10px',
+                        zIndex: 3,
+                        padding: '4px 12px',
+                        borderRadius: '20px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        letterSpacing: '0.5px',
+                        fontFamily: 'Gotham Book, sans-serif',
+                        backgroundColor: product.badge === 'new' ? '#1a2744' : '#B38728',
+                        color: '#ffffff',
+                        textTransform: 'uppercase',
+                    }}>
+                        {product.badge === 'new' ? 'Mới' : 'Bán nhiều'}
+                    </div>
+                )}
                 <Image
                     src={selectedVariant.image}
                     alt={product.name}
@@ -51,11 +77,15 @@ export const ProductCard = ({ product }: { product: Product }) => {
                     opacity: isHovered ? 1 : 0,
                     transform: isHovered ? 'translateX(0)' : 'translateX(10px)',
                 }}>
-                    <Tooltip title="Xem nhanh" placement="left">
+                    <Tooltip title="Xem chi tiết" placement="left">
                         <Button
                             shape="circle"
                             icon={<EyeOutlined />}
                             style={styles.actionButton}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                goToDetail();
+                            }}
                         />
                     </Tooltip>
                     <Tooltip title="Thêm vào giỏ" placement="left">
@@ -65,13 +95,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
                             style={styles.actionButton}
                             onClick={(e) => {
                                 e.stopPropagation();
-                                addToCart({
-                                    id: selectedVariant.variantId,
-                                    name: `${product.name} - ${selectedVariant.colorName}`,
-                                    price: selectedVariant.price,
-                                    quantity: 1,
-                                    image: selectedVariant.image
-                                });
+                                setModalOpen(true);
                             }}
                         />
                     </Tooltip>
@@ -108,13 +132,20 @@ export const ProductCard = ({ product }: { product: Product }) => {
             </div>
 
             <div style={styles.productInfo}>
+                <Text style={styles.category}>{product.category}</Text>
                 <Text style={styles.productName}>{product.name}</Text>
                 <div style={styles.priceRow}>
                     <Text strong style={styles.price}>
-                        {formatPrice(selectedVariant.price)}
+                        {formatPrice(selectedVariant.price)}/m
                     </Text>
                 </div>
             </div>
+
+            <AddToCartModal
+                product={product}
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+            />
         </div>
     );
 };
@@ -140,7 +171,7 @@ const styles = StyleSheet.create({
     },
     variantList: {
         position: 'absolute',
-        top: '10px',
+        top: '40px',
         left: '10px',
         display: 'flex',
         flexDirection: 'column',
@@ -189,6 +220,15 @@ const styles = StyleSheet.create({
     productInfo: {
         textAlign: 'center',
         paddingTop: '14px',
+    },
+    category: {
+        display: 'block',
+        fontSize: '12px',
+        color: 'rgba(139, 115, 85, 0.65)',
+        fontFamily: 'Gotham Book, sans-serif',
+        letterSpacing: '0.5px',
+        marginBottom: '4px',
+        textAlign: 'left',
     },
     productName: {
         display: 'block',

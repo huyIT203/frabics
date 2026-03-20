@@ -21,21 +21,10 @@ const { useBreakpoint } = Grid;
 const { Text } = Typography;
 
 const CATEGORIES = [
-    { label: 'Tất cả', key: 'all' },
-    { label: 'Nổi bật', key: 'featured' },
-    { label: 'Mới nhất', key: 'newest' },
-    { label: 'Linen', key: 'linen' },
-    { label: 'Kaki', key: 'kaki' },
-    { label: 'Thun', key: 'thun' },
-    { label: 'Ren/lưới', key: 'ren-luoi' },
-    { label: 'Gấm', key: 'gam' },
-    { label: 'Lụa', key: 'lua' },
-    { label: 'Tơ/voan', key: 'to-voan' },
-    { label: 'Len', key: 'len' },
-    { label: 'Tweed/bố/dạ', key: 'tweed' },
-    { label: 'Tafta', key: 'tafta' },
-    { label: 'Boi/kate', key: 'boi-kate' },
-    { label: 'Khác', key: 'other' },
+    { label: 'Hàng mới', key: 'hang-moi' },
+    { label: 'Nổi bật', key: 'noi-bat' },
+    { label: 'Bộ sưu tập', key: 'bo-suu-tap' },
+    { label: 'Pre-look', key: 'pre-look' },
 ];
 
 const getMenuItems = (isProductOpen: boolean): MenuProps['items'] => [
@@ -60,7 +49,7 @@ const getMenuItems = (isProductOpen: boolean): MenuProps['items'] => [
         ),
         children: CATEGORIES.map(cat => ({
             key: cat.key,
-            label: <Link href={`/products?category=${cat.key}`}>{cat.label}</Link>,
+            label: <Link href={`/san-pham/${cat.key}`}>{cat.label}</Link>,
             style: styles.subMenuItem
         }))
     },

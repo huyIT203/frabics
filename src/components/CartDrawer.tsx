@@ -1,5 +1,5 @@
-import { Drawer, Button, Typography, Grid } from 'antd';
-import { ShoppingCartOutlined, DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
+import { Drawer, Button, Typography, Grid, InputNumber, Modal } from 'antd';
+import { ShoppingCartOutlined, DeleteOutlined } from '@ant-design/icons';
 import { StyleSheet } from '@/shared/utils/styles';
 import { useCartStore } from '@/store/useCartStore';
 import Image from 'next/image';
@@ -13,12 +13,12 @@ interface CartDrawerProps {
 }
 
 export const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
-    const { items, removeFromCart, addToCart } = useCartStore();
+    const { items, removeFromCart, updateItem, clearCart } = useCartStore();
     const screens = useBreakpoint();
 
-    const drawerWidth = screens.md ? 400 : '100%';
+    const drawerWidth = screens.md ? 580 : '100%';
 
-    const totalPrice = items.reduce((total, item) => total + item.price * item.quantity, 0);
+    const totalPrice = items.reduce((total, item) => total + item.price, 0);
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -26,15 +26,44 @@ export const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
 
     return (
         <Drawer
-            title={<Title level={4} style={{ margin: 0, letterSpacing: '2px' }}>GIỎ HÀNG ({items.length})</Title>}
+            title={
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Title level={4} style={{ margin: 0, letterSpacing: '2px' }}>GIỎ HÀNG ({items.length})</Title>
+                    {items.length > 0 && (
+                        <Button
+                            type="text"
+                            danger
+                            icon={<DeleteOutlined />}
+                            onClick={() => {
+                                if (items.length >= 2) {
+                                    Modal.confirm({
+                                        title: 'Xóa tất cả sản phẩm',
+                                        content: 'Bạn có chắc chắn muốn xóa tất cả sản phẩm khỏi giỏ hàng?',
+                                        okText: 'Xóa tất cả',
+                                        cancelText: 'Hủy',
+                                        okButtonProps: { danger: true },
+                                        centered: true,
+                                        onOk: clearCart,
+                                    });
+                                } else {
+                                    clearCart();
+                                }
+                            }}
+                            style={{ fontSize: '13px', letterSpacing: '0.5px' }}
+                        >
+                            Xóa tất cả
+                        </Button>
+                    )}
+                </div>
+            }
             placement="right"
             onClose={onClose}
             open={open}
-            width={drawerWidth}
             styles={{
                 header: { borderBottom: '1px solid #f0f0f0', padding: '20px' },
                 body: { padding: 0 },
-                footer: { padding: '20px', borderTop: '1px solid #f0f0f0' }
+                footer: { padding: '20px', borderTop: '1px solid #f0f0f0' },
+                wrapper: { width: drawerWidth },
             }}
             footer={
                 items.length > 0 && (
@@ -50,7 +79,7 @@ export const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                             block
                             style={styles.checkoutButton}
                         >
-                            THANH TOÁN NGAY
+                            Đi đến thanh toán
                         </Button>
                         <Button
                             type="text"
@@ -101,23 +130,36 @@ export const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                                         danger
                                     />
                                 </div>
+                                {item.colorName && (
+                                    <Text type="secondary" style={{ fontSize: '12px', color: '#888' }}>
+                                        Màu: {item.colorName}
+                                    </Text>
+                                )}
+                                <div style={styles.metersRow}>
+                                    <Text type="secondary" style={{ fontSize: '12px', marginRight: '8px' }}>Số mét:</Text>
+                                    <InputNumber
+                                        min={0.5}
+                                        step={0.5}
+                                        value={item.meters || 1}
+                                        size="small"
+                                        style={{ width: '90px' }}
+                                        onChange={(val) => {
+                                            const newMeters = val || 0.5;
+                                            const unitPrice = item.meters ? item.price / item.meters : item.price;
+                                            updateItem(item.id, { meters: newMeters, price: unitPrice * newMeters });
+                                        }}
+                                    />
+                                </div>
                                 <Text type="secondary" style={styles.itemPrice}>
                                     {formatCurrency(item.price)}
                                 </Text>
-                                <div style={styles.quantityControl}>
-                                    <Button
-                                        icon={<MinusOutlined />}
-                                        size="small"
-                                        disabled={item.quantity <= 1}
-                                        onClick={() => addToCart({ ...item, quantity: -1 })}
-                                    />
-                                    <Text style={{ margin: '0 10px' }}>{item.quantity}</Text>
-                                    <Button
-                                        icon={<PlusOutlined />}
-                                        size="small"
-                                        onClick={() => addToCart({ ...item, quantity: 1 })}
-                                    />
-                                </div>
+                                {item.note && (
+                                    <div style={{ marginTop: '6px', padding: '6px 8px', backgroundColor: '#fafafa', borderRadius: '4px', border: '1px solid #f0f0f0' }}>
+                                        <Text type="secondary" style={{ fontSize: '12px', whiteSpace: 'pre-wrap' }}>
+                                            📝 {item.note}
+                                        </Text>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}
@@ -173,10 +215,10 @@ const styles = StyleSheet.create({
         fontSize: '14px',
         color: '#231F20',
     },
-    quantityControl: {
+    metersRow: {
         display: 'flex',
         alignItems: 'center',
-        marginTop: '10px',
+        marginTop: '4px',
     },
     footerContainer: {
         width: '100%',

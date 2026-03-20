@@ -18,6 +18,8 @@ export const NewArrivals = () => {
     const { ref, animationStyle } = useScrollFadeIn(0.1);
     const { isMobile } = useResponsive();
 
+    const newProducts = MOCK_PRODUCTS.filter(p => p.badge === 'new');
+
     return (
         <section ref={ref as React.RefObject<HTMLElement>} style={{
             ...styles.container,
@@ -40,7 +42,7 @@ export const NewArrivals = () => {
                     }}>
                         Hàng Mới
                     </Title>
-                    <ExploreButton variant="dark" size={isMobile ? 'small' : 'default'} isStatic={isMobile} />
+                    <ExploreButton variant="dark" size={isMobile ? 'small' : 'default'} isStatic={isMobile} href="/san-pham/hang-moi" />
                 </div>
                 <Text style={{
                     ...styles.subTitle,
@@ -57,7 +59,7 @@ export const NewArrivals = () => {
                     gap: '12px',
                     padding: '0 8px',
                 }}>
-                    {MOCK_PRODUCTS.slice(0, 6).map((product) => (
+                    {newProducts.slice(0, 6).map((product) => (
                         <div key={product.id}>
                             <ProductCard product={product} />
                         </div>
@@ -81,7 +83,7 @@ export const NewArrivals = () => {
                             { breakpoint: 768, settings: { slidesToShow: 2 } },
                         ]}
                     >
-                        {MOCK_PRODUCTS.map((product) => (
+                        {newProducts.map((product) => (
                             <div key={product.id}>
                                 <ProductCard product={product} />
                             </div>

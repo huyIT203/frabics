@@ -6,6 +6,10 @@ interface CartItem {
     price: number;
     quantity: number;
     image?: string;
+    colorName?: string;
+    colorCode?: string;
+    meters?: number;
+    note?: string;
 }
 
 interface CartState {
@@ -13,6 +17,7 @@ interface CartState {
     isOpen: boolean;
     setOpen: (open: boolean) => void;
     addToCart: (item: CartItem) => void;
+    updateItem: (id: string | number, updates: Partial<CartItem>) => void;
     removeFromCart: (id: string | number) => void;
     clearCart: () => void;
 }
@@ -37,6 +42,12 @@ export const useCartStore = create<CartState>((set) => ({
                 isOpen: true,
             };
         }),
+    updateItem: (id, updates) =>
+        set((state) => ({
+            items: state.items.map((i) =>
+                i.id === id ? { ...i, ...updates } : i
+            ),
+        })),
     removeFromCart: (id) =>
         set((state) => ({
             items: state.items.filter((i) => i.id !== id),

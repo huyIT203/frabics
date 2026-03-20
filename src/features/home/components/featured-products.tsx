@@ -16,6 +16,8 @@ export const FeaturedProducts = () => {
     const { ref, animationStyle } = useScrollFadeIn(0.1);
     const { isMobile } = useResponsive();
 
+    const bestSellerProducts = MOCK_PRODUCTS.filter(p => p.badge === 'best-seller');
+
     return (
         <section ref={ref as React.RefObject<HTMLElement>} style={{
             ...styles.container,
@@ -33,7 +35,7 @@ export const FeaturedProducts = () => {
                         margin: 0,
                         lineHeight: 1,
                     }}>Sản Phẩm Nổi Bật</Typography.Title>
-                    <ExploreButton variant="dark" size={isMobile ? 'small' : 'default'} isStatic={isMobile} />
+                    <ExploreButton variant="dark" size={isMobile ? 'small' : 'default'} isStatic={isMobile} href="/san-pham/noi-bat" />
                 </div>
                 <Typography.Text type="secondary" style={{
                     ...styles.subTitle,
@@ -50,7 +52,7 @@ export const FeaturedProducts = () => {
                     gap: '12px',
                     padding: '0 8px',
                 }}>
-                    {MOCK_PRODUCTS.slice(0, 6).map((product) => (
+                    {bestSellerProducts.slice(0, 6).map((product) => (
                         <div key={product.id}>
                             <ProductCard product={product} />
                         </div>
@@ -74,7 +76,7 @@ export const FeaturedProducts = () => {
                             { breakpoint: 768, settings: { slidesToShow: 2 } },
                         ]}
                     >
-                        {MOCK_PRODUCTS.map((product) => (
+                        {bestSellerProducts.map((product) => (
                             <div key={product.id}>
                                 <ProductCard product={product} />
                             </div>

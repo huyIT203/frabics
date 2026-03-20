@@ -38,7 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                             <Header />
 
                             {/* 2. Nội dung chính (Page) - flex: 1 để đẩy Footer xuống dưới */}
-                            <main style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
+                            <main style={{ flex: 1, backgroundColor: '#ffffff' }}>
                                 {children}
                             </main>
 

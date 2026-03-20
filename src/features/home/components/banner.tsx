@@ -177,7 +177,7 @@ export const HomeBanner = () => {
                 </div>
 
                 {/* CTA Button */}
-                <ExploreButton variant="light" onClick={scrollToCollections} />
+                <ExploreButton variant="light" href="/san-pham/bo-suu-tap" />
             </div>
         </section>
     );
