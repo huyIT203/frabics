@@ -80,13 +80,6 @@ export const HomeBanner = () => {
         }
     }, []);
 
-    const scrollToCollections = () => {
-        const element = document.getElementById('home-collections');
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
-        }
-    };
-
     const textParallax = {
         transform: `translate(${mousePos.x * 8}px, ${mousePos.y * 5}px)`,
         transition: 'transform 0.4s ease-out',
