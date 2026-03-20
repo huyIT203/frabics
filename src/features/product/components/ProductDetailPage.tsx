@@ -163,8 +163,9 @@ export const ProductDetailPage = () => {
     return (
         <div style={{
             ...styles.pageContainer,
-            width: isMobile ? 'calc(100% - 20px)' : 'calc(100% - 60px)',
-            padding: isMobile ? '20px 16px' : '30px 30px',
+            width: isMobile ? '100%' : 'calc(100% - 60px)',
+            padding: isMobile ? '16px' : '30px 30px',
+            marginTop: isMobile ? '80px' : '70px',
         }}>
             {/* Breadcrumb */}
             <Breadcrumb
@@ -188,21 +189,22 @@ export const ProductDetailPage = () => {
             <div style={{
                 ...styles.mainContent,
                 flexDirection: isMobile ? 'column' : 'row',
+                gap: isMobile ? '0' : '40px',
             }}>
-                {/* LEFT Column: Gallery + Related Products */}
+                {/* LEFT Column: Gallery (+ Related Products on desktop) */}
                 <div style={{ width: isMobile ? '100%' : '55%' }}>
                     {/* Image Gallery */}
                     <div style={{
                         ...styles.gallerySection,
-                        flexDirection: isMobile ? 'column-reverse' : 'row',
+                        flexDirection: isMobile ? 'column' : 'row',
                     }}>
                         {/* Thumbnails */}
+                        {/* Thumbnails - on desktop: left column, on mobile: below image */}
+                        {!isMobile && (
                         <div style={{
                             ...styles.thumbnailList,
-                            flexDirection: isMobile ? 'row' : 'column',
-                            width: isMobile ? '100%' : '80px',
-                            overflowX: isMobile ? 'auto' : 'hidden',
-                            marginTop: isMobile ? '12px' : '0',
+                            flexDirection: 'column',
+                            width: '80px',
                         }}>
                             {allImages.map((img, idx) => (
                                 <div
@@ -227,11 +229,14 @@ export const ProductDetailPage = () => {
                                 </div>
                             ))}
                         </div>
+                        )}
 
                         {/* Main Image */}
                         <div style={{
                             ...styles.mainImage,
-                            height: isMobile ? '400px' : '560px',
+                            height: isMobile ? '350px' : '560px',
+                            width: isMobile ? '100%' : undefined,
+                            flex: isMobile ? 'none' : 1,
                         }}>
                             <Image
                                 src={allImages[selectedImageIndex]?.src || selectedVariant.image}
@@ -240,9 +245,46 @@ export const ProductDetailPage = () => {
                                 style={{ objectFit: 'cover' }}
                             />
                         </div>
+
+                        {/* Mobile Thumbnails - horizontal row below image */}
+                        {isMobile && (
+                        <div style={{
+                            ...styles.thumbnailList,
+                            flexDirection: 'row',
+                            width: '100%',
+                            overflowX: 'auto',
+                            marginTop: '12px',
+                        }}>
+                            {allImages.map((img, idx) => (
+                                <div
+                                    key={idx}
+                                    style={{
+                                        ...styles.thumbnail,
+                                        width: '60px',
+                                        height: '60px',
+                                        borderColor: selectedImageIndex === idx ? '#B38728' : '#e0e0e0',
+                                        opacity: selectedImageIndex === idx ? 1 : 0.6,
+                                    }}
+                                    onClick={() => {
+                                        setSelectedImageIndex(idx);
+                                        const variant = product.variants.find(v => v.image === img.src);
+                                        if (variant) setSelectedVariant(variant);
+                                    }}
+                                >
+                                    <Image
+                                        src={img.src}
+                                        alt={img.colorName}
+                                        fill
+                                        style={{ objectFit: 'cover' }}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                        )}
                     </div>
 
-                    {/* Related Products Slider */}
+                    {/* Related Products Slider - only on desktop in left column */}
+                    {!isMobile && (
                     <div style={{ marginTop: '30px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                             <Text strong style={{ ...styles.relatedTitle, marginBottom: 0 }}>Sản phẩm liên quan</Text>
@@ -261,13 +303,12 @@ export const ProductDetailPage = () => {
                         </div>
                         <Carousel
                             ref={relatedCarouselRef}
-                            slidesToShow={isMobile ? 2 : 3}
+                            slidesToShow={3}
                             slidesToScroll={1}
                             dots={false}
                             infinite={true}
                             responsive={[
                                 { breakpoint: 1200, settings: { slidesToShow: 2 } },
-                                { breakpoint: 768, settings: { slidesToShow: 2 } },
                             ]}
                         >
                             {(() => {
@@ -281,23 +322,30 @@ export const ProductDetailPage = () => {
                             })()}
                         </Carousel>
                     </div>
+                    )}
                 </div>
 
                 {/* RIGHT: Product Info */}
                 <div style={{
                     ...styles.infoSection,
                     width: isMobile ? '100%' : '42%',
-                    marginTop: isMobile ? '24px' : '0',
+                    marginTop: isMobile ? '20px' : '0',
                 }}>
                     {/* Category tag */}
                     <Text style={styles.categoryTag}>{product.category}</Text>
 
                     {/* Product name */}
-                    <Title level={2} style={styles.productTitle}>{product.name}</Title>
+                    <Title level={2} style={{
+                        ...styles.productTitle,
+                        fontSize: isMobile ? '22px' : undefined,
+                    }}>{product.name}</Title>
 
                     {/* Price */}
                     <div style={styles.priceSection}>
-                        <Text style={styles.price}>{formatPrice(selectedVariant.price)}</Text>
+                        <Text style={{
+                            ...styles.price,
+                            fontSize: isMobile ? '22px' : '26px',
+                        }}>{formatPrice(selectedVariant.price)}</Text>
                         <Text style={styles.priceUnit}> / mét</Text>
                     </div>
 
@@ -368,7 +416,7 @@ export const ProductDetailPage = () => {
                             onChange={(val) => setMeters(val || 0.5)}
                             addonAfter="mét"
                             size="large"
-                            style={{ width: '140px', height: '54px' }}
+                            style={{ width: isMobile ? '120px' : '140px', height: '54px' }}
                         />
                         <Button
                             type="primary"
@@ -388,17 +436,55 @@ export const ProductDetailPage = () => {
                     {/* Tabs Section - Folder style */}
                     <div style={{
                         ...styles.tabsSection,
-                        marginTop: '30px',
+                        marginTop: isMobile ? '20px' : '30px',
                     }}>
                         <Tabs
                             defaultActiveKey="description"
                             items={tabItems}
-                            size="large"
+                            size={isMobile ? 'middle' : 'large'}
                             className="folder-tabs"
                             style={{ fontFamily: 'Gotham Book, sans-serif' }}
                         />
                     </div>
                 </div>
+
+                {/* Related Products - on mobile: below product info */}
+                {isMobile && (
+                <div style={{ marginTop: '30px', width: '100%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                        <Text strong style={{ ...styles.relatedTitle, marginBottom: 0 }}>Sản phẩm liên quan</Text>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <CarouselArrowButton
+                                direction="left"
+                                onClick={() => relatedCarouselRef.current?.prev()}
+                                style={{ position: 'static', width: '32px', height: '32px', fontSize: '12px' }}
+                            />
+                            <CarouselArrowButton
+                                direction="right"
+                                onClick={() => relatedCarouselRef.current?.next()}
+                                style={{ position: 'static', width: '32px', height: '32px', fontSize: '12px' }}
+                            />
+                        </div>
+                    </div>
+                    <Carousel
+                        ref={relatedCarouselRef}
+                        slidesToShow={2}
+                        slidesToScroll={1}
+                        dots={false}
+                        infinite={true}
+                    >
+                        {(() => {
+                            const related = FEATURED_PRODUCTS_DATA.filter(p => p.category === product.category && p.id !== product.id);
+                            const items = related.length > 0 ? related : FEATURED_PRODUCTS_DATA.filter(p => p.id !== product.id);
+                            return items.map((p) => (
+                                <div key={p.id} style={{ padding: '0 6px' }}>
+                                    <ProductCard product={p} />
+                                </div>
+                            ));
+                        })()}
+                    </Carousel>
+                </div>
+                )}
             </div>
         </div>
     );
